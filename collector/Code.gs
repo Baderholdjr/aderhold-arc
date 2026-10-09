@@ -42,6 +42,9 @@ function doGet(e) {
   t.campaignCode = campaign ? campaign.code : '';
   t.displayName = campaign ? campaign.displayName : '';
   t.isOpen = !!(campaign && campaign.active);
+  // Why a link is closed: 'nocode' (link has no ?c=), 'notfound' (code not in Campaigns tab), 'inactive'
+  t.closedReason = !code ? 'nocode' : (!campaign ? 'notfound' : (campaign.active ? '' : 'inactive'));
+  t.requestedCode = code;
   t.instrumentJson = JSON.stringify(ARC_INSTRUMENT);
   return t.evaluate()
     .setTitle('Aderhold A.R.C. Pulse Survey')
@@ -103,10 +106,35 @@ function findCampaign_(code) {
   var rows = sh.getRange(2, 1, sh.getLastRow() - 1, 3).getValues();
   for (var i = 0; i < rows.length; i++) {
     if (normalizeCode_(rows[i][0]) === code) {
-      return { code: code, displayName: String(rows[i][1] || ''), active: rows[i][2] === true || String(rows[i][2]).toUpperCase() === 'TRUE' };
+      return { code: code, displayName: String(rows[i][1] || ''), active: isActive_(rows[i][2]) };
     }
   }
   return null;
+}
+
+/** Accepts a ticked checkbox, TRUE, Yes, Y, 1 or Open (any case, extra spaces ignored). */
+function isActive_(v) {
+  if (v === true) return true;
+  return ['TRUE', 'YES', 'Y', '1', 'OPEN', 'ACTIVE'].indexOf(String(v).trim().toUpperCase()) >= 0;
+}
+
+/**
+ * Run from the Apps Script editor (select checkSetup, click Run, then View > Logs / Execution log)
+ * to see what the survey sees: tabs, campaign codes and whether each is active.
+ */
+function checkSetup() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  Logger.log('Spreadsheet: ' + ss.getName());
+  Logger.log('Tabs: ' + ss.getSheets().map(function (s) { return s.getName(); }).join(', '));
+  var camp = ss.getSheetByName(CAMPAIGNS_TAB);
+  if (!camp) { Logger.log('PROBLEM: no "' + CAMPAIGNS_TAB + '" tab. Run setup() first.'); return; }
+  if (camp.getLastRow() < 2) { Logger.log('PROBLEM: Campaigns tab has no rows below the header.'); return; }
+  camp.getRange(2, 1, camp.getLastRow() - 1, 3).getValues().forEach(function (r, i) {
+    Logger.log('Row ' + (i + 2) + ': code="' + normalizeCode_(r[0]) + '" active=' + isActive_(r[2]) + ' (cell value: ' + JSON.stringify(r[2]) + ')');
+  });
+  var url = ScriptApp.getService().getUrl();
+  Logger.log('Web app URL (current deployment): ' + (url || 'not deployed yet'));
+  if (url) Logger.log('Test link: ' + url + '?c=TEST-0001');
 }
 
 function normalizeCode_(c) {
