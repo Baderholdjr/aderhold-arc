@@ -61,3 +61,13 @@ From then on it runs every night at about 3:17 a.m. Pacific.
 ## Changing the instrument version
 
 Responses from different instrument versions must not mix. Before deploying a new `Items.gs`, rename the existing **Responses** tab (e.g. `Responses v1.0.0`) and run **setup** again. Item ids that stay the same remain comparable in the benchmark.
+
+## Troubleshooting
+
+| What you see | Cause | Fix |
+| --- | --- | --- |
+| "Sorry, unable to open the file at this time. Please check the address and try again." | A known Google issue when the browser is signed into **more than one Google account**. It can also mean the URL is malformed, or the deployment was archived. | Open the link in a **private/incognito window**. Respondents are usually signed into one account or none, so they won't see this. Copy the exact link printed by `checkSetup()`. |
+| "This survey link is not active" | The link has no `?c=CODE`, the code isn't in the Campaigns tab, or the campaign is set inactive | The page states which one. Run `checkSetup()` and read the execution log. |
+| Changes don't appear | The deployment still points to an old version | **Deploy → Manage deployments → pencil → Version: New version → Deploy** |
+| Nightly run says secrets are not set | `ARC_SHEET_ID` / `GOOGLE_SERVICE_ACCOUNT` are missing | Step 4 above |
+| Nightly run fails with a permission error | The Sheet isn't shared with the service account email | Share the Sheet with it as Viewer |
