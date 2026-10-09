@@ -1,0 +1,13 @@
+# Never commit respondent-level data, credentials or generated client reports
+reports/
+data/*
+!data/demo/
+*.env
+.env*
+*service-account*.json
+*credentials*.json
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+.DS_Store

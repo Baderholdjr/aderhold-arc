@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<style>
+  :root { --ink:#18222d; --quiet:#5b6b7c; --line:#d8dee5; --brand:#1f3a5f; --brand-soft:#e8eef5; --bg:#f7f8fa; --err:#b03a2e; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family: Arial, Helvetica, sans-serif; color:var(--ink); background:var(--bg); line-height:1.45; }
+  header { background:var(--brand); color:#fff; padding:18px 16px; }
+  header .wrap { max-width:760px; margin:0 auto; }
+  header h1 { margin:0; font-size:20px; letter-spacing:.2px; }
+  header p { margin:4px 0 0; opacity:.85; font-size:14px; }
+  main { max-width:760px; margin:0 auto; padding:20px 16px 64px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px; margin-bottom:16px; }
+  h2 { font-size:18px; margin:0 0 6px; }
+  .lead { color:var(--quiet); margin:0 0 14px; font-size:14px; }
+  .progress { height:6px; background:var(--line); border-radius:3px; margin:0 0 16px; overflow:hidden; }
+  .progress div { height:100%; background:var(--brand); width:0; transition:width .2s; }
+  .q { padding:14px 0; border-top:1px solid var(--line); }
+  .q:first-of-type { border-top:none; }
+  .q p { margin:0 0 10px; font-weight:600; font-size:15px; }
+  .scale { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
+  .opts { display:flex; flex-wrap:wrap; gap:6px; }
+  .scale label, .opts label { border:1px solid var(--line); border-radius:8px; padding:9px 6px; text-align:center; font-size:12.5px; cursor:pointer; background:#fff; }
+  .opts label { padding:9px 12px; }
+  .scale input, .opts input { position:absolute; opacity:0; pointer-events:none; }
+  .scale label:has(input:checked), .opts label:has(input:checked) { background:var(--brand); color:#fff; border-color:var(--brand); }
+  .scale label:focus-within, .opts label:focus-within { outline:2px solid var(--brand); outline-offset:2px; }
+  textarea { width:100%; min-height:90px; border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; }
+  .nav { display:flex; justify-content:space-between; gap:12px; margin-top:8px; }
+  button { font:inherit; font-weight:600; border-radius:8px; padding:11px 18px; border:1px solid var(--brand); cursor:pointer; }
+  button.primary { background:var(--brand); color:#fff; }
+  button.secondary { background:#fff; color:var(--brand); }
+  button:disabled { opacity:.5; cursor:default; }
+  .check { display:flex; gap:10px; align-items:flex-start; margin:10px 0; font-size:14px; }
+  .check input { margin-top:3px; }
+  .err { color:var(--err); font-size:14px; min-height:20px; margin-top:8px; }
+  .hp { position:absolute; left:-9999px; }
+  .pillars { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+  .pill { border:1px solid var(--line); border-radius:8px; padding:12px; }
+  .pill b { display:block; } .pill span { font-size:28px; font-weight:700; color:var(--brand); }
+  .meter { height:6px; background:var(--line); border-radius:3px; margin-top:6px; }
+  .meter div { height:100%; background:var(--brand); border-radius:3px; }
+  .small { font-size:12.5px; color:var(--quiet); }
+  @media (max-width:560px) { .scale { grid-template-columns:1fr; } .scale label { text-align:left; } .pillars { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<header><div class="wrap"><h1>Aderhold A.R.C. Pulse Survey</h1><p id="org"></p></div></header>
+<main>
+  <div class="progress" aria-hidden="true"><div id="bar"></div></div>
+  <div id="app"></div>
+</main>
+<script>
+var INSTRUMENT = <?!= instrumentJson ?>;
+var CAMPAIGN = <?!= JSON.stringify(campaignCode) ?>;
+var DISPLAY = <?!= JSON.stringify(displayName) ?>;
+var IS_OPEN = <?!= JSON.stringify(isOpen) ?>;
+
+var answers = {}; var consentResearch = false; var step = 0; var sending = false;
+var role = INSTRUMENT.behavioral.filter(function (b) { return b.key === 'role'; })[0];
+var behavior = INSTRUMENT.behavioral.filter(function (b) { return b.key !== 'role'; });
+var steps = ['intro', 'role'].concat(INSTRUMENT.pillars.map(function (p) { return 'pillar:' + p.name; })).concat(['behavior', 'open']);
+
+document.getElementById('org').textContent = DISPLAY ? 'For ' + DISPLAY : '';
+
+function el(html) { var d = document.createElement('div'); d.innerHTML = html; return d.firstElementChild; }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+
+function render() {
+  var app = document.getElementById('app'); app.innerHTML = '';
+  document.getElementById('bar').style.width = Math.round(step / steps.length * 100) + '%';
+  if (!IS_OPEN) {
+    app.appendChild(el('<div class="card"><h2>This survey link is not active</h2><p class="lead">Please check the link you were given, or contact the person who sent it.</p></div>'));
+    return;
+  }
+  var s = steps[step];
+  if (s === 'intro') return renderIntro(app);
+  if (s === 'role') return renderOptions(app, 'About you', '', [role]);
+  if (s.indexOf('pillar:') === 0) return renderPillar(app, s.slice(7));
+  if (s === 'behavior') return renderOptions(app, 'How you use AI today', 'Choose the closest answer.', behavior);
+  if (s === 'open') return renderOpen(app);
+}
+
+function renderIntro(app) {
+  var c = el('<div class="card"><h2>Your experience with AI at work</h2>' +
+    '<p class="lead">About 12 minutes. There are no right answers; we want your honest view of how AI tools are working for you and your team.</p>' +
+    '<ul class="small"><li><b>Anonymous.</b> We do not collect your name, email or device details.</li>' +
+    '<li><b>Reported in groups only.</b> Results are shown only for groups of 5 or more people.</li>' +
+    '<li><b>Voluntary.</b> You may skip any question or stop at any time.</li></ul>' +
+    '<label class="check"><input type="checkbox" id="consent"> <span>I understand and agree to take part.</span></label>' +
+    '<label class="check"><input type="checkbox" id="research"> <span>Optional: my anonymous answers may also be included in aggregated research to improve the A.R.C. framework.</span></label>' +
+    '<div class="err" id="err"></div><div class="nav"><span></span><button class="primary" id="next">Start</button></div></div>');
+  app.appendChild(c);
+  c.querySelector('#research').checked = consentResearch;
+  c.querySelector('#next').onclick = function () {
+    if (!c.querySelector('#consent').checked) { c.querySelector('#err').textContent = 'Please confirm you agree to take part.'; return; }
+    consentResearch = c.querySelector('#research').checked; go(1);
+  };
+}
+
+function scaleHtml(id) {
+  return '<div class="scale" role="radiogroup">' + INSTRUMENT.scale.map(function (lab, i) {
+    var v = i + 1; var chk = String(answers[id]) === String(v) ? ' checked' : '';
+    return '<label><input type="radio" name="' + esc(id) + '" value="' + v + '"' + chk + '>' + esc(lab) + '</label>';
+  }).join('') + '</div>';
+}
+
+function renderPillar(app, pillar) {
+  var dims = INSTRUMENT.dimensions.filter(function (d) { return d.pillar === pillar; });
+  var meta = INSTRUMENT.pillars.filter(function (p) { return p.name === pillar; })[0];
+  var html = '<div class="card"><h2>' + esc(pillar) + '</h2><p class="lead">' + esc(meta.question) + ' How much do you agree with each statement?</p>';
+  dims.forEach(function (d) { d.items.forEach(function (it) { html += '<div class="q"><p>' + esc(it.text) + '</p>' + scaleHtml(it.id) + '</div>'; }); });
+  html += navHtml() + '</div>';
+  var c = el(html); app.appendChild(c); wire(c);
+}
+
+function renderOptions(app, title, lead, questions) {
+  var html = '<div class="card"><h2>' + esc(title) + '</h2>' + (lead ? '<p class="lead">' + esc(lead) + '</p>' : '');
+  questions.forEach(function (b) {
+    html += '<div class="q"><p>' + esc(b.text) + '</p><div class="opts" role="radiogroup">' + b.options.map(function (o) {
+      var v = o.value === null ? '' : String(o.value); var chk = answers[b.key] !== undefined && String(answers[b.key]) === v ? ' checked' : '';
+      return '<label><input type="radio" name="' + esc(b.key) + '" value="' + esc(v) + '"' + chk + '>' + esc(o.label) + '</label>';
+    }).join('') + '</div></div>';
+  });
+  html += navHtml() + '</div>';
+  var c = el(html); app.appendChild(c); wire(c);
+}
+
+function renderOpen(app) {
+  var c = el('<div class="card"><h2>One last question</h2><div class="q"><p>' + esc(INSTRUMENT.openQuestion) + '</p>' +
+    '<textarea id="open" maxlength="1000" placeholder="Optional. Please do not include names."></textarea></div>' +
+    '<input class="hp" type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
+    '<div class="err" id="err"></div><div class="nav"><button class="secondary" id="back">Back</button><button class="primary" id="submit">Submit</button></div></div>');
+  app.appendChild(c);
+  c.querySelector('#open').value = answers.open_text || '';
+  c.querySelector('#back').onclick = function () { answers.open_text = c.querySelector('#open').value; go(-1); };
+  c.querySelector('#submit').onclick = function () {
+    if (sending) return;
+    answers.open_text = c.querySelector('#open').value;
+    sending = true; this.disabled = true; this.textContent = 'Sending...';
+    var btn = this;
+    google.script.run
+      .withSuccessHandler(function () { thankYou(); })
+      .withFailureHandler(function (e) { sending = false; btn.disabled = false; btn.textContent = 'Submit'; c.querySelector('#err').textContent = (e && e.message) || 'Something went wrong. Please try again.'; })
+      .submitResponse({ campaign: CAMPAIGN, consentResearch: consentResearch, answers: answers, website: c.querySelector('#website').value });
+  };
+}
+
+function navHtml() {
+  return '<div class="err" id="err"></div><div class="nav"><button class="secondary" id="back">Back</button><button class="primary" id="next">Next</button></div>';
+}
+
+function wire(c) {
+  c.addEventListener('change', function (e) { if (e.target.type === 'radio') answers[e.target.name] = e.target.value; });
+  c.querySelector('#back').onclick = function () { go(-1); };
+  c.querySelector('#next').onclick = function () {
+    if (steps[step] === 'role' && !answers.role) { c.querySelector('#err').textContent = 'Please select your role.'; return; }
+    go(1);
+  };
+}
+
+function go(d) { step = Math.max(0, Math.min(steps.length - 1, step + d)); render(); window.scrollTo(0, 0); }
+
+function personalScores() {
+  return INSTRUMENT.pillars.map(function (p) {
+    var vals = [];
+    INSTRUMENT.dimensions.filter(function (d) { return d.pillar === p.name; }).forEach(function (d) {
+      d.items.forEach(function (it) { var v = Number(answers[it.id]); if (v >= 1 && v <= 5) vals.push(it.reverse ? 6 - v : v); });
+    });
+    var idx = vals.length ? Math.round((vals.reduce(function (a, b) { return a + b; }, 0) / vals.length - 1) / 4 * 100) : null;
+    return { name: p.name, index: idx };
+  });
+}
+
+function thankYou() {
+  document.getElementById('bar').style.width = '100%';
+  var app = document.getElementById('app'); app.innerHTML = '';
+  var html = '<div class="card"><h2>Thank you. Your answers were recorded.</h2>' +
+    '<p class="lead">Here is how your own answers map to the A.R.C. framework (0-100). This is only your view; your organization will see group results, never yours individually.</p><div class="pillars">';
+  personalScores().forEach(function (s) {
+    html += '<div class="pill"><b>' + esc(s.name) + '</b><span>' + (s.index === null ? '-' : s.index) + '</span>' +
+      '<div class="meter"><div style="width:' + (s.index || 0) + '%"></div></div></div>';
+  });
+  html += '</div><p class="small" style="margin-top:14px">Aderhold A.R.C.&trade; Acceptance, Reliance and Collaboration in human-AI work. You may close this page.</p></div>';
+  app.appendChild(el(html));
+}
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+name: Nightly scoring
+
+# Pulls responses from the private Google Sheet, scores every campaign, builds client
+# reports (uploaded as private workflow artifacts) and refreshes the aggregate benchmark.
+# Respondent-level data is never written to the repository.
+
+on:
+  schedule:
+    - cron: "17 10 * * *"   # 03:17 Pacific (daylight time) every day
+  workflow_dispatch:
+    inputs:
+      campaign:
+        description: "Only score this campaign code (optional)"
+        required: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: nightly-scoring
+  cancel-in-progress: false
+
+jobs:
+  score:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+
+      - name: Check secrets are configured
+        id: secrets
+        env:
+          ARC_SHEET_ID: ${{ secrets.ARC_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$ARC_SHEET_ID" ] || [ -z "$GOOGLE_SERVICE_ACCOUNT" ]; then
+            echo "::warning::ARC_SHEET_ID / GOOGLE_SERVICE_ACCOUNT secrets are not set yet. See docs/SETUP.md. Skipping."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Score campaigns
+        if: steps.secrets.outputs.ready == 'true'
+        env:
+          ARC_SHEET_ID: ${{ secrets.ARC_SHEET_ID }}
+          GOOGLE_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT }}
+          CAMPAIGN: ${{ github.event.inputs.campaign }}
+        run: |
+          ARGS="--source sheets --out reports --benchmark benchmark/summary.json"
+          if [ -n "$CAMPAIGN" ]; then ARGS="$ARGS --campaign $CAMPAIGN"; fi
+          python -m arc run $ARGS
+          cat reports/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload client reports (private artifacts, 30 days)
+        if: steps.secrets.outputs.ready == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: arc-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30
+
+      - name: Commit refreshed benchmark (aggregates only)
+        if: steps.secrets.outputs.ready == 'true' && (github.event_name == 'schedule' || inputs.campaign == '')
+        run: |
+          git config user.name "arc-bot"
+          git config user.email "arc-bot@users.noreply.github.com"
+          git add benchmark/summary.json
+          if git diff --cached --quiet; then echo "Benchmark unchanged"; else
+            git commit -m "Nightly benchmark refresh" && git push
+          fi

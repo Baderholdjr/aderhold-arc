@@ -1,0 +1,28 @@
+# Campaign configuration (one file per client survey wave). File name = campaign code.
+# Use a code name for the client if you prefer; this repo is private but keep it minimal.
+client: Client name or code name
+survey_open: YYYY-MM-DD
+survey_close: YYYY-MM-DD
+roi:
+  users: 500
+  hours_saved_per_week: 3        # client pilot data or vendor benchmark
+  loaded_hourly_cost: 60
+  working_weeks: 46
+  healthy_verification_share: 0.20
+  tool_cost_per_user_year: 360
+  overrides:                     # leave blank (~) to use the survey-derived value
+    adoption: ~
+    depth: ~
+    verification: ~
+    capture: ~
+  targets: {adoption: 0.75, depth: 0.65, verification: 0.25, capture: 0.75}
+  errors_per_year: 12
+  cost_per_error: 25000
+  error_reduction: 0.5
+  turnover_rate: 0.15
+  ai_attributable_turnover_share: 0.10
+  average_salary: 85000
+  replacement_cost_pct: 0.5
+  attrition_reduction: 0.30
+  confidence_haircut: 0.5
+  engagement_fee: 150000

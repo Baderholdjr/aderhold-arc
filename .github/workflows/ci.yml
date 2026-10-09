@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements-dev.txt
+      - name: Unit tests (engine reproduces the Excel workbook)
+        run: python -m pytest -q
+      - name: Survey questions in sync with instrument/items.yaml
+        run: |
+          python -m arc build-collector
+          git diff --exit-code collector/Items.gs || (echo "::error::collector/Items.gs is out of date. Run: python -m arc build-collector" && exit 1)
+      - name: End-to-end run on demo data
+        run: python -m arc run --source csv --path data/demo --out reports --benchmark /tmp/benchmark.json
