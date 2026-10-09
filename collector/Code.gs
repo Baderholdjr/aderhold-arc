@@ -132,9 +132,16 @@ function checkSetup() {
   camp.getRange(2, 1, camp.getLastRow() - 1, 3).getValues().forEach(function (r, i) {
     Logger.log('Row ' + (i + 2) + ': code="' + normalizeCode_(r[0]) + '" active=' + isActive_(r[2]) + ' (cell value: ' + JSON.stringify(r[2]) + ')');
   });
-  var url = ScriptApp.getService().getUrl();
-  Logger.log('Web app URL (current deployment): ' + (url || 'not deployed yet'));
-  if (url) Logger.log('Test link: ' + url + '?c=TEST-0001');
+  var url = ScriptApp.getService().getUrl() || '';
+  if (/\/dev$/.test(url)) {
+    // When run from the editor, Google reports the private /dev test URL, which only the owner can open.
+    Logger.log('NOTE: the editor reports the private test URL (ends in /dev). Respondents need the public /exec URL.');
+    Logger.log('Get it from Deploy > Manage deployments (Web app, Execute as: Me, Who has access: Anyone), then add ?c=TEST-0001');
+  } else if (url) {
+    Logger.log('Test link: ' + url + '?c=TEST-0001');
+  } else {
+    Logger.log('Not deployed yet: Deploy > New deployment > Web app.');
+  }
 }
 
 function normalizeCode_(c) {
