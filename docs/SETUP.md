@@ -67,6 +67,7 @@ Responses from different instrument versions must not mix. Before deploying a ne
 | What you see | Cause | Fix |
 | --- | --- | --- |
 | "Sorry, unable to open the file at this time. Please check the address and try again." | A known Google issue when the browser is signed into **more than one Google account**. It can also mean the URL is malformed, or the deployment was archived. | Open the link in a **private/incognito window**. Respondents are usually signed into one account or none, so they won't see this. Copy the exact link printed by `checkSetup()`. |
+| Same message even in incognito, with the correct `/exec` link, and the script owned by a **Google Workspace** (company domain) account | The Workspace admin setting that blocks sharing outside the organization also blocks anonymous web-app access | Admin console: **Apps → Google Workspace → Drive and Docs → Sharing settings → Sharing options** → allow sharing outside the organization. This can take up to 24 hours (usually minutes). Or own the Sheet and script with a personal Gmail account instead. |
 | "This survey link is not active" | The link has no `?c=CODE`, the code isn't in the Campaigns tab, or the campaign is set inactive | The page states which one. Run `checkSetup()` and read the execution log. |
 | Changes don't appear | The deployment still points to an old version | **Deploy → Manage deployments → pencil → Version: New version → Deploy** |
 | Nightly run says secrets are not set | `ARC_SHEET_ID` / `GOOGLE_SERVICE_ACCOUNT` are missing | Step 4 above |
