@@ -1,7 +1,7 @@
 /**
  * Aderhold A.R.C. Pulse Survey collector (Google Apps Script, bound to the private response Sheet).
  *
- * - doGet serves the survey page for a campaign link:  <web app URL>?c=ACME-2026Q4
+ * - doGet serves the survey page for a campaign link:  <web app URL>?code=ACME-2026Q4
  * - submitResponse() appends one anonymous row to the "Responses" tab.
  * - Only campaigns listed as active in the "Campaigns" tab accept responses.
  *
@@ -36,13 +36,13 @@ function setup() {
 }
 
 function doGet(e) {
-  var code = normalizeCode_((e && e.parameter && e.parameter.c) || '');
+  var code = normalizeCode_((e && e.parameter && e.parameter.code) || '');
   var campaign = findCampaign_(code);
   var t = HtmlService.createTemplateFromFile('Survey');
   t.campaignCode = campaign ? campaign.code : '';
   t.displayName = campaign ? campaign.displayName : '';
   t.isOpen = !!(campaign && campaign.active);
-  // Why a link is closed: 'nocode' (link has no ?c=), 'notfound' (code not in Campaigns tab), 'inactive'
+  // Why a link is closed: 'nocode' (link has no ?code=; note: "c" is reserved by Google and must not be used), 'notfound' (code not in Campaigns tab), 'inactive'
   t.closedReason = !code ? 'nocode' : (!campaign ? 'notfound' : (campaign.active ? '' : 'inactive'));
   t.requestedCode = code;
   t.instrumentJson = JSON.stringify(ARC_INSTRUMENT);
@@ -136,9 +136,9 @@ function checkSetup() {
   if (/\/dev$/.test(url)) {
     // When run from the editor, Google reports the private /dev test URL, which only the owner can open.
     Logger.log('NOTE: the editor reports the private test URL (ends in /dev). Respondents need the public /exec URL.');
-    Logger.log('Get it from Deploy > Manage deployments (Web app, Execute as: Me, Who has access: Anyone), then add ?c=TEST-0001');
+    Logger.log('Get it from Deploy > Manage deployments (Web app, Execute as: Me, Who has access: Anyone), then add ?code=TEST-0001');
   } else if (url) {
-    Logger.log('Test link: ' + url + '?c=TEST-0001');
+    Logger.log('Test link: ' + url + '?code=TEST-0001');
   } else {
     Logger.log('Not deployed yet: Deploy > New deployment > Web app.');
   }

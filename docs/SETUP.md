@@ -20,7 +20,7 @@ You need a Google account and this GitHub repository. Everything uses free tiers
    * Execute as: **Me**
    * Who has access: **Anyone**. Respondents don't sign in, which keeps the survey anonymous.
    * Click **Deploy** and copy the **Web app URL**.
-6. Test it: open `<Web app URL>?c=TEST-0001`, complete the survey, and check that a row appears in **Responses**.
+6. Test it: open `<Web app URL>?code=TEST-0001`, complete the survey, and check that a row appears in **Responses**.
 
 > When you later update `Survey.html`, `Code.gs` or `Items.gs`: **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy**. The URL stays the same.
 
@@ -55,7 +55,7 @@ From then on it runs every night at about 3:17 a.m. Pacific.
 1. Pick a code such as `ACME-2026Q4`, using letters, digits and dashes.
 2. Add a row to the Sheet's **Campaigns** tab: `code = ACME-2026Q4`, `display_name = Acme`, `active = TRUE`.
 3. Add `campaigns/ACME-2026Q4.yaml` to the repo, copied from `campaigns/_TEMPLATE.yaml`.
-4. Send the link: `<Web app URL>?c=ACME-2026Q4`. The client's sponsor should send it, explaining the purpose and the anonymity rules.
+4. Send the link: `<Web app URL>?code=ACME-2026Q4`. The client's sponsor should send it, explaining the purpose and the anonymity rules.
 5. When the wave closes, set `active = FALSE`. The link then shows "not active".
 
 ## Changing the instrument version
@@ -68,7 +68,8 @@ Responses from different instrument versions must not mix. Before deploying a ne
 | --- | --- | --- |
 | "Sorry, unable to open the file at this time. Please check the address and try again." | A known Google issue when the browser is signed into **more than one Google account**. It can also mean the URL is malformed, or the deployment was archived. | Open the link in a **private/incognito window**. Respondents are usually signed into one account or none, so they won't see this. Copy the exact link printed by `checkSetup()`. |
 | Same message even in incognito, with the correct `/exec` link, and the script owned by a **Google Workspace** (company domain) account | The Workspace admin setting that blocks sharing outside the organization also blocks anonymous web-app access | Admin console: **Apps → Google Workspace → Drive and Docs → Sharing settings → Sharing options** → allow sharing outside the organization. This can take up to 24 hours (usually minutes). Or own the Sheet and script with a personal Gmail account instead. |
-| "This survey link is not active" | The link has no `?c=CODE`, the code isn't in the Campaigns tab, or the campaign is set inactive | The page states which one. Run `checkSetup()` and read the execution log. |
+| "Sorry, unable to open the file" only when the link has a `?c=` parameter | Google reserves the URL parameters `c` and `sid` for Apps Script itself | Use `?code=` (the survey reads `code`). |
+| "This survey link is not active" | The link has no `?code=CODE`, the code isn't in the Campaigns tab, or the campaign is set inactive | The page states which one. Run `checkSetup()` and read the execution log. |
 | Changes don't appear | The deployment still points to an old version | **Deploy → Manage deployments → pencil → Version: New version → Deploy** |
 | Nightly run says secrets are not set | `ARC_SHEET_ID` / `GOOGLE_SERVICE_ACCOUNT` are missing | Step 4 above |
 | Nightly run fails with a permission error | The Sheet isn't shared with the service account email | Share the Sheet with it as Viewer |

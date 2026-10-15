@@ -9,7 +9,7 @@ This repository is the operating system for the Aderhold A.R.C. consulting pract
 
 ```
 Client survey link ──► Survey page (Google Apps Script) ──► Private Google Sheet
-   …/exec?c=ACME-2026Q4      anonymous, consent, 12 min         one row per response
+   …/exec?code=ACME-2026Q4   anonymous, consent, 12 min         one row per response
                                                                        │
                               GitHub Actions, nightly (or on demand) ◄─┘
                                        │
@@ -40,7 +40,7 @@ Client survey link ──► Survey page (Google Apps Script) ──► Private 
 ## Everyday use
 
 1. **New client wave.** Copy `campaigns/_TEMPLATE.yaml` to `campaigns/<CODE>.yaml` and fill in the ROI inputs. Add the same code to the **Campaigns** tab of the Sheet with `active = TRUE`.
-2. **Send the link.** `<web app URL>?c=<CODE>`.
+2. **Send the link.** `<web app URL>?code=<CODE>`.
 3. **Watch results.** The nightly run (or **Actions → Nightly scoring → Run workflow**) scores every campaign. Download the reports from the run's **Artifacts**.
 4. **Close the wave.** Set `active = FALSE` in the Campaigns tab.
 
