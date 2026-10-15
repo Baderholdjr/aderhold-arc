@@ -20,13 +20,17 @@
   .q { padding:14px 0; border-top:1px solid var(--line); }
   .q:first-of-type { border-top:none; }
   .q p { margin:0 0 10px; font-weight:600; font-size:15px; }
+  /* Answer choices: visible radio buttons. The whole row is clickable and its text can't be selected,
+     so a quick tap or a slightly dragged click still registers. */
   .scale { display:grid; grid-template-columns:repeat(5,1fr); gap:6px; }
-  .opts { display:flex; flex-wrap:wrap; gap:6px; }
-  .scale label, .opts label { border:1px solid var(--line); border-radius:8px; padding:9px 6px; text-align:center; font-size:12.5px; cursor:pointer; background:#fff; }
-  .opts label { padding:9px 12px; }
-  .scale input, .opts input { position:absolute; opacity:0; pointer-events:none; }
-  .scale label:has(input:checked), .opts label:has(input:checked) { background:var(--brand); color:#fff; border-color:var(--brand); }
-  .scale label:focus-within, .opts label:focus-within { outline:2px solid var(--brand); outline-offset:2px; }
+  .opts { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:6px; }
+  .scale label, .opts label { display:flex; align-items:center; gap:8px; border:1px solid var(--line); border-radius:8px;
+    padding:10px; font-size:13px; line-height:1.25; cursor:pointer; background:#fff;
+    user-select:none; -webkit-user-select:none; -webkit-tap-highlight-color:transparent; touch-action:manipulation; }
+  .scale label { flex-direction:column; justify-content:flex-start; text-align:center; gap:6px; }
+  .scale input, .opts input { flex:none; width:20px; height:20px; margin:0; accent-color:var(--brand); cursor:pointer; }
+  .scale label:hover, .opts label:hover { border-color:var(--brand); }
+  .scale label:has(input:checked), .opts label:has(input:checked) { background:var(--brand-soft); border-color:var(--brand); font-weight:600; }
   textarea { width:100%; min-height:90px; border:1px solid var(--line); border-radius:8px; padding:10px; font:inherit; }
   .nav { display:flex; justify-content:space-between; gap:12px; margin-top:8px; }
   button { font:inherit; font-weight:600; border-radius:8px; padding:11px 18px; border:1px solid var(--brand); cursor:pointer; }
@@ -34,7 +38,8 @@
   button.secondary { background:#fff; color:var(--brand); }
   button:disabled { opacity:.5; cursor:default; }
   .check { display:flex; gap:10px; align-items:flex-start; margin:10px 0; font-size:14px; }
-  .check input { margin-top:3px; }
+  .check { cursor:pointer; user-select:none; -webkit-user-select:none; }
+  .check input { margin-top:1px; width:18px; height:18px; flex:none; accent-color:var(--brand); }
   .err { color:var(--err); font-size:14px; min-height:20px; margin-top:8px; }
   .hp { position:absolute; left:-9999px; }
   .pillars { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
@@ -43,7 +48,7 @@
   .meter { height:6px; background:var(--line); border-radius:3px; margin-top:6px; }
   .meter div { height:100%; background:var(--brand); border-radius:3px; }
   .small { font-size:12.5px; color:var(--quiet); }
-  @media (max-width:560px) { .scale { grid-template-columns:1fr; } .scale label { text-align:left; } .pillars { grid-template-columns:1fr; } }
+  @media (max-width:560px) { .scale, .opts { grid-template-columns:1fr; } .scale label { flex-direction:row; text-align:left; gap:10px; } .pillars { grid-template-columns:1fr; } }
 </style>
 </head>
 <body>
