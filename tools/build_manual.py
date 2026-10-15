@@ -104,11 +104,18 @@ def build() -> str:
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
 <style>
 {css}
+/* ONI brand mark on the cover: light artwork by default, dark artwork in dark theme */
+.brand{{margin:0 0 18px}}
+.brand .logo{{display:block;width:clamp(200px,40vw,310px);height:auto;border-radius:8px}}
+.brand .logo-dark{{display:none}}
+@media (prefers-color-scheme: dark){{:root:not([data-theme="light"]) .brand .logo-light{{display:none}} :root:not([data-theme="light"]) .brand .logo-dark{{display:block}}}}
+:root[data-theme="dark"] .brand .logo-light{{display:none}} :root[data-theme="dark"] .brand .logo-dark{{display:block}}
+:root[data-theme="light"] .brand .logo-dark{{display:none}} :root[data-theme="light"] .brand .logo-light{{display:block}}
 </style></head><body>
 <div class="wrap">
 <nav class="toc" aria-label="Contents"><p>Contents</p><ol>{''.join(nav)}</ol></nav>
 <main>
-<header class="cover"><p class="kicker">Aderhold A.R.C. · Acceptance · Reliance · Collaboration</p><h1>User manual</h1>
+<header class="cover"><div class="brand"><img class="logo logo-light" src="images/oni-logo-light.png" alt="ONI: The Human Element in AI" width="310" height="146"><img class="logo logo-dark" src="images/oni-logo-dark.png" alt="ONI: The Human Element in AI" width="310" height="146"></div><p class="kicker">Aderhold A.R.C. · an ONI framework · Acceptance · Reliance · Collaboration</p><h1>User manual</h1>
 <p class="meta">Engine version {ENGINE_VERSION} · Instrument version {INSTRUMENT_VERSION} · Product guide, training guide and troubleshooting guide</p></header>
 {''.join(sections)}
 </main></div>
