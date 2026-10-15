@@ -24,8 +24,8 @@ jobs:
   score:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -54,11 +54,12 @@ jobs:
           ARGS="--source sheets --out reports --benchmark benchmark/summary.json"
           if [ -n "$CAMPAIGN" ]; then ARGS="$ARGS --campaign $CAMPAIGN"; fi
           python -m arc run $ARGS
+          cp benchmark/summary.json reports/benchmark_summary.json
           cat reports/SUMMARY.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload client reports (private artifacts, 30 days)
         if: steps.secrets.outputs.ready == 'true'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: arc-reports-${{ github.run_number }}
           path: reports/
@@ -70,6 +71,15 @@ jobs:
           git config user.name "arc-bot"
           git config user.email "arc-bot@users.noreply.github.com"
           git add benchmark/summary.json
-          if git diff --cached --quiet; then echo "Benchmark unchanged"; else
-            git commit -m "Nightly benchmark refresh" && git push
+          if git diff --cached --quiet; then
+            echo "Benchmark unchanged"; exit 0
           fi
+          git commit -m "Nightly benchmark refresh"
+          # main may have moved since checkout: rebase onto the latest before pushing
+          for attempt in 1 2 3; do
+            if git pull --rebase origin "${GITHUB_REF_NAME}" && git push origin "HEAD:${GITHUB_REF_NAME}"; then
+              echo "Benchmark committed"; exit 0
+            fi
+            sleep $((attempt * 5))
+          done
+          echo "::warning::Could not push the benchmark update (it is still included in the reports artifact). If this repeats, check Settings > Actions > General > Workflow permissions = Read and write."
