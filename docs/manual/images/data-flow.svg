@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 330" font-family="IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-label="How a survey response flows through Aderhold A.R.C.">
+<defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b75"/></marker></defs>
+<rect width="760" height="330" fill="#ffffff"/>
+<text x="24" y="30" font-size="15" font-weight="600" fill="#183b4e">Answers stay in your private Sheet; only aggregates leave it</text>
+<g font-size="13" fill="#1b2a33">
+<rect x="16" y="60" width="176" height="74" rx="8" fill="#e8f3f1" stroke="#2f6f73"/>
+<text x="104" y="88" text-anchor="middle" font-weight="600">Survey link</text>
+<text x="104" y="106" text-anchor="middle" font-size="11.5" fill="#5b6b75">…/exec?code=ACME-2026Q4</text>
+<text x="104" y="122" text-anchor="middle" font-size="11.5" fill="#5b6b75">anonymous, ~12 min</text>
+<rect x="212" y="60" width="164" height="74" rx="8" fill="#fff" stroke="#5b6b75"/>
+<text x="294" y="88" text-anchor="middle" font-weight="600">Apps Script</text>
+<text x="294" y="106" text-anchor="middle" font-size="11.5" fill="#5b6b75">serves the page,</text>
+<text x="294" y="122" text-anchor="middle" font-size="11.5" fill="#5b6b75">checks the campaign code</text>
+<rect x="396" y="60" width="186" height="74" rx="8" fill="#e9eff6" stroke="#26496b"/>
+<text x="489" y="88" text-anchor="middle" font-weight="600">Private Google Sheet</text>
+<text x="489" y="106" text-anchor="middle" font-size="11.5" fill="#5b6b75">Responses + Campaigns tabs</text>
+<text x="489" y="122" text-anchor="middle" font-size="11.5" fill="#5b6b75">one row per response</text>
+<rect x="254" y="190" width="320" height="56" rx="8" fill="#fff" stroke="#183b4e" stroke-width="1.5"/>
+<text x="414" y="214" text-anchor="middle" font-weight="600">GitHub Actions: Nightly scoring</text>
+<text x="414" y="232" text-anchor="middle" font-size="11.5" fill="#5b6b75">read-only service account, 03:17 Pacific or on demand</text>
+<rect x="24" y="262" width="210" height="52" rx="8" fill="#f1f3f4" stroke="#5b6b75"/>
+<text x="129" y="284" text-anchor="middle" font-weight="600">Client reports</text>
+<text x="129" y="301" text-anchor="middle" font-size="11.5" fill="#5b6b75">private artifacts, 30 days</text>
+<rect x="276" y="262" width="210" height="52" rx="8" fill="#f1f3f4" stroke="#5b6b75"/>
+<text x="381" y="284" text-anchor="middle" font-weight="600">Benchmark</text>
+<text x="381" y="301" text-anchor="middle" font-size="11.5" fill="#5b6b75">aggregates, committed to repo</text>
+<rect x="528" y="262" width="210" height="52" rx="8" fill="#f1f3f4" stroke="#5b6b75"/>
+<text x="633" y="284" text-anchor="middle" font-weight="600">Validation statistics</text>
+<text x="633" y="301" text-anchor="middle" font-size="11.5" fill="#5b6b75">consented responses only</text>
+</g>
+<g fill="none" stroke="#5b6b75" stroke-width="1.25">
+<path d="M192 97H210" marker-end="url(#a)"/><path d="M376 97H394" marker-end="url(#a)"/>
+<path d="M489 134V188" marker-end="url(#a)"/>
+<path d="M300 246V254H129V260" marker-end="url(#a)"/><path d="M381 246V260" marker-end="url(#a)"/><path d="M520 246V254H633V260" marker-end="url(#a)"/>
+</g>
+<rect x="600" y="60" width="144" height="74" rx="8" fill="#fbf1e2" stroke="#8a5a12" stroke-dasharray="4 3"/>
+<text x="672" y="88" text-anchor="middle" font-size="12" font-weight="600" fill="#8a5a12">Never leaves</text>
+<text x="672" y="105" text-anchor="middle" font-size="11.5" fill="#8a5a12">respondent-level rows</text>
+<text x="672" y="121" text-anchor="middle" font-size="11.5" fill="#8a5a12">stay in the Sheet</text>
+</svg>

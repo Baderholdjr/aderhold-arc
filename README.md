@@ -58,3 +58,7 @@ python -m arc build-collector                    # after editing items.yaml
 ## Changing the instrument
 
 Edit `instrument/items.yaml`, bump `instrument.version`, run `python -m arc build-collector`, and paste the new `Items.gs` into Apps Script. Do not change item ids, or responses can no longer be compared with the benchmark. A new version needs a new Responses tab (see SETUP).
+
+## Manual
+
+The user manual (product guide, training guide, troubleshooting guide) is in [`docs/manual/`](docs/manual/). Edit `docs/manual/manual.md`, then run `python tools/build_manual.py` to rebuild `index.html`.

@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 236" font-family="IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-label="Where each training module fits in an engagement">
+<defs><marker id="c" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b75"/></marker></defs>
+<rect width="760" height="236" fill="#ffffff"/>
+<text x="24" y="30" font-size="15" font-weight="600" fill="#183b4e">One-time setup, then the same loop for every client wave</text>
+<g font-size="13" fill="#1b2a33">
+<rect x="24" y="52" width="160" height="96" rx="8" fill="#f1f3f4" stroke="#5b6b75"/>
+<text x="104" y="76" text-anchor="middle" font-weight="600">Set up (once)</text>
+<text x="104" y="96" text-anchor="middle" font-size="11.5" fill="#5b6b75">Modules 1-3</text>
+<text x="104" y="112" text-anchor="middle" font-size="11.5" fill="#5b6b75">Google, GitHub,</text>
+<text x="104" y="128" text-anchor="middle" font-size="11.5" fill="#5b6b75">test campaign</text>
+<rect x="222" y="52" width="160" height="96" rx="8" fill="#e8f3f1" stroke="#2f6f73"/>
+<text x="302" y="76" text-anchor="middle" font-weight="600">Launch a wave</text>
+<text x="302" y="96" text-anchor="middle" font-size="11.5" fill="#5b6b75">Modules 4-5</text>
+<text x="302" y="112" text-anchor="middle" font-size="11.5" fill="#5b6b75">campaign code,</text>
+<text x="302" y="128" text-anchor="middle" font-size="11.5" fill="#5b6b75">ROI inputs, link</text>
+<rect x="420" y="52" width="150" height="96" rx="8" fill="#e8f3f1" stroke="#2f6f73"/>
+<text x="495" y="76" text-anchor="middle" font-weight="600">Read and deliver</text>
+<text x="495" y="96" text-anchor="middle" font-size="11.5" fill="#5b6b75">Modules 6-7</text>
+<text x="495" y="112" text-anchor="middle" font-size="11.5" fill="#5b6b75">report, readout,</text>
+<text x="495" y="128" text-anchor="middle" font-size="11.5" fill="#5b6b75">90-day roadmap</text>
+<rect x="608" y="52" width="128" height="96" rx="8" fill="#e8f3f1" stroke="#2f6f73"/>
+<text x="672" y="76" text-anchor="middle" font-weight="600">Re-measure</text>
+<text x="672" y="96" text-anchor="middle" font-size="11.5" fill="#5b6b75">Module 8</text>
+<text x="672" y="112" text-anchor="middle" font-size="11.5" fill="#5b6b75">close wave,</text>
+<text x="672" y="128" text-anchor="middle" font-size="11.5" fill="#5b6b75">next quarter</text>
+</g>
+<g fill="none" stroke="#5b6b75" stroke-width="1.25"><path d="M184 100H220" marker-end="url(#c)"/><path d="M382 100H418" marker-end="url(#c)"/><path d="M570 100H606" marker-end="url(#c)"/><path d="M672 148V178H302V150" marker-end="url(#c)"/></g>
+<text x="487" y="172" text-anchor="middle" font-size="11.5" fill="#5b6b75">next quarter: new campaign code, same client</text>
+<g font-size="11.5" fill="#3d4b53"><rect x="24" y="194" width="712" height="28" rx="6" fill="#fbf1e2"/>
+<text x="36" y="212">Ongoing: Module 9 (update the survey) as needed · Module 10 (weekly routine) every week</text></g>
+</svg>

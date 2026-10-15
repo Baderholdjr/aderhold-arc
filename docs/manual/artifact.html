@@ -1,0 +1,1020 @@
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aderhold A.R.C. Manual</title>
+<meta name="description" content="User manual for Aderhold A.R.C.: product guide, training guide and troubleshooting.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=Source+Serif+4:opsz,wght@8..60,600&display=swap">
+<style>
+/* Manual: quiet reading layout. Navy/teal from the house style of the Word brief; three layer colours. */
+:root{
+  --paper:#fbfcfc; --surface:#ffffff; --ink:#1b2a33; --muted:#5b6b75; --rule:#dbe3e7;
+  --navy:#183b4e; --teal:#2f6f73;
+  --plain-bg:#e8f3f1; --plain-fg:#1f5f5b; --prac-bg:#e9eff6; --prac-fg:#26496b;
+  --tech-bg:#f1f3f4; --tech-fg:#3d4b53; --shot-bg:transparent; --shot-fg:#8a5a12; --lesson-bg:#fbf1e2;
+  --code-bg:#f1f4f5;
+  --display:"Source Serif 4", "Iowan Old Style", Georgia, serif;
+  --body:"IBM Plex Sans", "Segoe UI", Helvetica, Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#12191d; --surface:#172126; --ink:#e3eaed; --muted:#9db0b8; --rule:#2c3a41;
+  --navy:#9ccbe0; --teal:#7cc3bd;
+  --plain-bg:#163029; --plain-fg:#9fd8cf; --prac-bg:#172739; --prac-fg:#a9c8e8;
+  --tech-bg:#1d272c; --tech-fg:#c3cfd4; --shot-fg:#e2b46a; --lesson-bg:#33281a; --code-bg:#1d272c; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#12191d; --surface:#172126; --ink:#e3eaed; --muted:#9db0b8; --rule:#2c3a41;
+  --navy:#9ccbe0; --teal:#7cc3bd;
+  --plain-bg:#163029; --plain-fg:#9fd8cf; --prac-bg:#172739; --prac-fg:#a9c8e8;
+  --tech-bg:#1d272c; --tech-fg:#c3cfd4; --shot-fg:#e2b46a; --lesson-bg:#33281a; --code-bg:#1d272c; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:16px/1.6 var(--body);margin:0}
+.wrap{display:grid;grid-template-columns:260px minmax(0,1fr);gap:48px;max-width:1180px;margin:0 auto;padding-inline:24px;padding-block:32px 80px}
+nav.toc{position:sticky;top:calc(env(safe-area-inset-top,0px) + 16px);align-self:start;max-height:calc(100vh - 32px);overflow:auto;font-size:14px;padding-right:8px}
+nav.toc p{font:600 13px var(--body);color:var(--muted);margin:18px 0 6px}
+nav.toc a{display:block;color:var(--ink);text-decoration:none;padding:3px 0;line-height:1.35}
+nav.toc a:hover{color:var(--teal)}
+nav.toc ol{list-style:none;margin:0;padding:0}
+nav.toc ol ol{padding-left:12px;border-left:1px solid var(--rule);margin:2px 0 8px}
+nav.toc ol ol a{color:var(--muted);font-size:13px}
+main{min-width:0;max-width:760px}
+header.cover{border-bottom:1px solid var(--rule);padding-bottom:28px;margin-bottom:12px}
+header.cover .kicker{font-size:14px;color:var(--muted);margin:0 0 6px}
+header.cover h1{font:600 clamp(32px,5vw,46px)/1.1 var(--display);color:var(--navy);margin:0;text-wrap:balance}
+header.cover .meta{color:var(--muted);margin:12px 0 0}
+section.part{padding-top:24px}
+section.part > h1{font:600 34px/1.15 var(--display);color:var(--navy);margin:48px 0 8px;text-wrap:balance;border-top:3px solid var(--navy);padding-top:22px}
+h2{font:600 25px/1.25 var(--display);color:var(--navy);margin:48px 0 10px;text-wrap:balance}
+h3{font:600 18px/1.35 var(--body);margin:32px 0 8px}
+p,li{max-width:70ch}
+a{color:var(--teal)}
+code{font:0.88em var(--mono);background:var(--code-bg);padding:1px 5px;border-radius:4px}
+pre{background:var(--code-bg);padding:14px 16px;border-radius:6px;overflow-x:auto;font:13px/1.5 var(--mono)}
+pre code{background:none;padding:0}
+.tbl{overflow-x:auto;margin:14px 0}
+table{border-collapse:collapse;font-size:14.5px;width:100%;font-variant-numeric:tabular-nums}
+th,td{border-bottom:1px solid var(--rule);padding:7px 10px;text-align:left;vertical-align:top}
+th{font-weight:600;color:var(--muted);border-bottom:2px solid var(--rule)}
+hr{border:0;border-top:1px solid var(--rule);margin:36px 0}
+.layer{display:block;margin:14px 0;padding:12px 16px 12px 16px;border-radius:6px;background:var(--tech-bg);color:var(--ink)}
+.layer p{margin:4px 0}
+.layer-label{display:block;font:600 12.5px var(--body);letter-spacing:.02em;margin-bottom:2px}
+.layer.plain{background:var(--plain-bg)} .layer.plain .layer-label{color:var(--plain-fg)}
+.layer.plain p{font-size:16.5px}
+.layer.practice{background:var(--prac-bg)} .layer.practice .layer-label{color:var(--prac-fg)}
+.layer.tech{background:var(--tech-bg);font-size:15px} .layer.tech .layer-label{color:var(--tech-fg);font-family:var(--mono);font-weight:500}
+.layer.shot{background:var(--shot-bg);border:1.5px dashed var(--shot-fg);color:var(--muted)} .layer.shot .layer-label{color:var(--shot-fg)}
+.layer.lesson{background:var(--lesson-bg)} .layer.lesson .layer-label{color:var(--shot-fg)}
+figure.fig{margin:22px 0;max-width:100%}
+figure.fig img{display:block;max-width:100%;height:auto;border:1px solid var(--rule);border-radius:6px;background:#fff}
+figure.fig.wide img{border:0}
+figcaption{font-size:13.5px;color:var(--muted);margin-top:6px}
+.legend{display:flex;flex-wrap:wrap;gap:8px 12px;margin:16px 0}
+.legend .layer{margin:0;flex:1 1 220px}
+:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media (max-width:900px){.wrap{grid-template-columns:1fr;gap:8px;padding-inline:16px}
+  nav.toc{position:static;max-height:none;border-bottom:1px solid var(--rule);padding-bottom:12px}
+  nav.toc ol ol{display:none}}
+@media print{
+  nav.toc{display:none} .wrap{display:block;max-width:none;padding:0}
+  main{max-width:none} body{font-size:10.5pt;background:#fff;color:#111}
+  section.part{break-before:page} section.part:first-of-type{break-before:auto}
+  h2,h3{break-after:avoid} figure,.layer,table,pre{break-inside:avoid}
+  a{color:inherit;text-decoration:none}
+}
+
+</style>
+<div class="wrap">
+<nav class="toc" aria-label="Contents"><p>Contents</p><ol><li><a href="#intro"><b>About this manual</b></a><ol><li><a href="#how-to-read-it">How to read it</a></li><li><a href="#keeping-it-current">Keeping it current</a></li></ol></li><li><a href="#part-1"><b>Product guide</b></a><ol><li><a href="#1-what-the-tool-is">1. What the tool is</a></li><li><a href="#2-the-arc-framework">2. The A.R.C. framework</a></li><li><a href="#3-the-pulse-survey">3. The Pulse Survey</a></li><li><a href="#4-campaigns-and-survey-links">4. Campaigns and survey links</a></li><li><a href="#5-where-responses-live">5. Where responses live</a></li><li><a href="#6-scoring">6. Scoring</a></li><li><a href="#7-the-value-leakage-roi-model">7. The Value Leakage (ROI) model</a></li><li><a href="#8-client-reports">8. Client reports</a></li><li><a href="#9-the-nightly-run">9. The nightly run</a></li><li><a href="#10-benchmark-across-clients">10. Benchmark across clients</a></li><li><a href="#11-validation-statistics">11. Validation statistics</a></li><li><a href="#12-the-excel-workbook">12. The Excel workbook</a></li><li><a href="#13-data-protection">13. Data protection</a></li><li><a href="#14-changing-the-instrument">14. Changing the instrument</a></li><li><a href="#15-boundaries-what-the-tool-will-and-wont-do">15. Boundaries: what the tool will and won't do</a></li><li><a href="#appendix-a-commands">Appendix A: Commands</a></li><li><a href="#appendix-b-workflows">Appendix B: Workflows</a></li><li><a href="#appendix-c-scoring-reference">Appendix C: Scoring reference</a></li><li><a href="#appendix-d-glossary">Appendix D: Glossary</a></li></ol></li><li><a href="#part-2"><b>Training guide</b></a><ol><li><a href="#module-0-the-golden-rules">Module 0: The golden rules</a></li><li><a href="#module-1-set-up-the-survey">Module 1: Set up the survey</a></li><li><a href="#module-2-connect-github-to-the-sheet">Module 2: Connect GitHub to the Sheet</a></li><li><a href="#module-3-run-a-test-campaign">Module 3: Run a test campaign</a></li><li><a href="#module-4-launch-a-client-wave">Module 4: Launch a client wave</a></li><li><a href="#module-5-set-the-roi-inputs-with-the-client">Module 5: Set the ROI inputs with the client</a></li><li><a href="#module-6-read-a-client-report">Module 6: Read a client report</a></li><li><a href="#module-7-deliver-the-readout">Module 7: Deliver the readout</a></li><li><a href="#module-8-close-the-wave-and-re-measure">Module 8: Close the wave and re-measure</a></li><li><a href="#module-9-update-the-survey">Module 9: Update the survey</a></li><li><a href="#module-10-your-weekly-routine">Module 10: Your weekly routine</a></li><li><a href="#appendix-screenshots-to-add">Appendix: screenshots to add</a></li></ol></li><li><a href="#part-3"><b>Troubleshooting guide</b></a><ol><li><a href="#before-anything-else">Before anything else</a></li><li><a href="#survey-link">Survey link</a></li><li><a href="#nightly-run">Nightly run</a></li><li><a href="#reports">Reports</a></li><li><a href="#when-you-need-help">When you need help</a></li></ol></li></ol></nav>
+<main>
+<header class="cover"><p class="kicker">Aderhold A.R.C. · Acceptance · Reliance · Collaboration</p><h1>User manual</h1>
+<p class="meta">Engine version 1.0.0 · Instrument version 1.0.0 · Product guide, training guide and troubleshooting guide</p></header>
+<section class="part" id="intro">
+<p>This manual covers Aderhold A.R.C.: the survey, scoring engine and automation that run an A.R.C. Gap Diagnostic from the first survey link to the client readout. It has three parts:</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Part</th>
+<th>Kind of guide</th>
+<th>Read it when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="#part-1">1. Product guide</a></td>
+<td>Reference</td>
+<td>You want to know what the tool can do, and how each part works</td>
+</tr>
+<tr>
+<td><a href="#part-2">2. Training guide</a></td>
+<td>Tutorial</td>
+<td>You're new and want to run a diagnostic end to end, step by step</td>
+</tr>
+<tr>
+<td><a href="#part-3">3. Troubleshooting guide</a></td>
+<td>Support</td>
+<td>Something didn't work and you need the fix</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="how-to-read-it">How to read it</h2>
+<p>Most sections are written in three layers, so readers with different backgrounds can each stop at the depth they need:</p>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>what it does and why it matters, without jargon. Enough for a client executive or a new team member.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>the same thing in diagnostic language: dimensions, indexes, severity, value leakage, the research behind it.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>the files, commands, workflows and rules involved. Enough to operate or change it.</p></aside>
+<aside class="layer shot"><span class="layer-label">Screenshot to add</span><p>marks a place where a screenshot of a Google or GitHub screen belongs. Those screens sit behind your sign-in, so they can't be captured automatically. The list of slots is in the <a href="#appendix-screenshots-to-add">training guide's appendix</a>.</p></aside>
+<p>Every other picture in this manual comes from the demo campaign, <strong>Demo Company (synthetic data)</strong>, campaign code <code>DEMO-2026Q4</code>. It is the same 40-response data set as the Excel workbook.</p>
+<h2 id="keeping-it-current">Keeping it current</h2>
+<p>This manual lives in the repository (<code>docs/manual/</code>) and is versioned with the engine. Screenshots of the survey and reports are captured from the demo campaign. Update the version line above when you release a new engine or instrument version, and refresh pictures whose screens have changed.</p>
+</section><section class="part" id="part-1"><h1 id="part-1-product-guide" data-part="part-1">Part 1: Product guide</h1>
+<p>What Aderhold A.R.C. does, feature by feature. Each section starts in plain language, then gives the practitioner's view, then the technical detail.</p>
+<h2 id="1-what-the-tool-is">1. What the tool is</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Companies buy AI tools and then get a fraction of the value, because people don't use them, don't trust them the right amount, or never change how they work. This tool measures those people-side gaps with a short anonymous survey, turns the answers into scores and a dollar estimate of the value being lost, and produces a client report. It runs itself every night once it's set up.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>The operational form of the A.R.C. Conceptual Framework (Aderhold, 2026). A 45-item Pulse Survey measures 15 gap dimensions across Acceptance, Reliance, Collaboration and a Foundation of human authority and accountability. Scores feed a maturity model, a perception-gap analysis (leaders vs. individual contributors) and the Value Leakage model, which estimates recoverable value. The instrument is research-based; psychometric validation accumulates automatically as consented responses arrive.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>Three components. A Google Apps Script web app (<code>collector/</code>) serves the survey and appends rows to a private Google Sheet. A Python package (<code>arc/</code>) scores responses, runs the ROI model and builds reports. GitHub Actions in the private repository <code>Baderholdjr/aderhold-arc</code> run tests on every push (<code>ci.yml</code>) and score every campaign nightly (<code>nightly.yml</code>). The single source of truth for questions and scoring bands is <code>instrument/items.yaml</code>.</p></aside>
+<figure class="fig wide"><img src="images/data-flow.svg" alt="How a survey response flows through Aderhold A.R.C." loading="lazy"><figcaption>How a survey response flows through Aderhold A.R.C.</figcaption></figure>
+<p><strong>Respondent-level data never leaves the Sheet.</strong> GitHub reads it with a read-only key, holds it in memory during the run, and keeps only group-level results.</p>
+<h2 id="2-the-arc-framework">2. The A.R.C. framework</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Three questions decide whether an AI rollout pays off. Will people use it willingly (Acceptance)? Do they trust it the right amount, neither blindly nor not at all (Reliance)? Has the work itself been reorganized around it (Collaboration)? Underneath sits a fourth question: are the rules on blame and overriding the AI fair (Foundation)?</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Each pillar has four gap dimensions and the Foundation has three. Each dimension traces to a dissertation finding: the onboarding deficit (A3), the post-failure trust lifecycle (R4), the partner–tool continuum (C3), cognitive sovereignty and asymmetric accountability (F1, F2).</p></aside>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Code</th>
+<th>Dimension</th>
+<th>Pillar</th>
+<th>Failure signature</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A1</td>
+<td>Purpose &amp; narrative clarity</td>
+<td>Acceptance</td>
+<td>"They're replacing us" fills the silence</td>
+</tr>
+<tr>
+<td>A2</td>
+<td>Role security &amp; psychological safety</td>
+<td>Acceptance</td>
+<td>Quiet compliance, hidden non-use, shadow AI</td>
+</tr>
+<tr>
+<td>A3</td>
+<td>Onboarding &amp; enablement</td>
+<td>Acceptance</td>
+<td>Staff learning on nights and weekends</td>
+</tr>
+<tr>
+<td>A4</td>
+<td>Demonstrated value</td>
+<td>Acceptance</td>
+<td>"Neat demo, not for my job"</td>
+</tr>
+<tr>
+<td>R1</td>
+<td>Explainability &amp; transparency</td>
+<td>Reliance</td>
+<td>Outputs nobody can defend</td>
+</tr>
+<tr>
+<td>R2</td>
+<td>Trust calibration</td>
+<td>Reliance</td>
+<td>Over-trust or blanket distrust</td>
+</tr>
+<tr>
+<td>R3</td>
+<td>Verification practice</td>
+<td>Reliance</td>
+<td>Rubber-stamping or redoing everything</td>
+</tr>
+<tr>
+<td>R4</td>
+<td>Failure response ("flop protocol")</td>
+<td>Reliance</td>
+<td>One mistake permanently collapses trust</td>
+</tr>
+<tr>
+<td>C1</td>
+<td>Workflow &amp; role redesign</td>
+<td>Collaboration</td>
+<td>AI bolted onto old process; time saved disappears</td>
+</tr>
+<tr>
+<td>C2</td>
+<td>AI direction competency</td>
+<td>Collaboration</td>
+<td>Poor instructions, poor results</td>
+</tr>
+<tr>
+<td>C3</td>
+<td>Teaming norms</td>
+<td>Collaboration</td>
+<td>Friction between enthusiasts and skeptics</td>
+</tr>
+<tr>
+<td>C4</td>
+<td>Expertise pipeline</td>
+<td>Collaboration</td>
+<td>Juniors never build real expertise</td>
+</tr>
+<tr>
+<td>F1</td>
+<td>Accountability model</td>
+<td>Foundation</td>
+<td>Blame lands on the human alone</td>
+</tr>
+<tr>
+<td>F2</td>
+<td>Right to override</td>
+<td>Foundation</td>
+<td>"Pressure to agree" with the machine</td>
+</tr>
+<tr>
+<td>F3</td>
+<td>Human-AI measurement</td>
+<td>Foundation</td>
+<td>Leaders fly blind</td>
+</tr>
+</tbody>
+</table></div>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>Dimensions, pillars and items are defined in <code>instrument/items.yaml</code> under <code>pillars:</code> and <code>dimensions:</code>. The playbook (<em>Aderhold A.R.C. Framework: Practitioner Playbook</em>) carries the full rationale, maturity descriptors and intervention catalog.</p></aside>
+<h2 id="3-the-pulse-survey">3. The Pulse Survey</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>A 12-minute anonymous survey on a phone or computer. People agree or disagree with 45 short statements, answer 8 quick questions about how they use AI, and can leave one comment. At the end they see their own scores, which only they can see.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>45 Likert items (3 per dimension, 1 = strongly disagree to 5 = strongly agree), 9 of them reverse-coded. Eight behavioral items: use frequency (B1), depth of use (B2), share of saved time spent re-checking (B3), errors reaching output in 90 days (B4), training hours (B5), own-time learning hours (B6), unapproved tools (B7) and role (B8). One open question. Consent to take part is required; consent to include answers in aggregated research is a separate, optional box.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>The page is <code>collector/Survey.html</code>, rendered by <code>doGet</code> in <code>collector/Code.gs</code>. Questions come from <code>collector/Items.gs</code>, which is <strong>generated</strong> from <code>instrument/items.yaml</code> by <code>python -m arc build-collector</code>; CI fails if it's out of date. Submissions go through <code>submitResponse()</code>, which rejects inactive campaigns, responses with under half the items answered, a missing role, and bots (a hidden honeypot field). Comments are capped at 1,000 characters and neutralized against spreadsheet formula injection.</p></aside>
+<figure class="fig"><img src="images/survey-intro.png" alt="The survey's welcome and consent screen" loading="lazy"><figcaption>The survey's welcome and consent screen</figcaption></figure>
+<figure class="fig"><img src="images/survey-question.png" alt="A statement on a phone" loading="lazy"><figcaption>A statement on a phone</figcaption></figure>
+<figure class="fig"><img src="images/survey-thanks.png" alt="The thank-you screen with the respondent's own scores" loading="lazy"><figcaption>The thank-you screen with the respondent's own scores</figcaption></figure>
+<h2 id="4-campaigns-and-survey-links">4. Campaigns and survey links</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Each client survey wave gets a short code, such as <code>ACME-2026Q4</code>. The code goes on the end of the survey link. Only codes you've switched on accept answers, so an old or mistyped link can't add stray data.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>One campaign = one client wave. Re-measuring a client next quarter is a new campaign (for example <code>ACME-2027Q1</code>), which makes trend comparison straightforward. Codes beginning <code>DEMO</code> or <code>TEST</code> are excluded from the benchmark.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>The link format is <code>&lt;Web app URL&gt;?code=&lt;CODE&gt;</code>. <strong>Never use <code>?c=</code></strong>: Google reserves the parameters <code>c</code> and <code>sid</code> for Apps Script itself (see <a href="#t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code">T-01</a>). Codes are normalized to upper case, letters, digits, <code>_</code> and <code>-</code>, at most 40 characters. A campaign is active when its row in the Sheet's <strong>Campaigns</strong> tab has <code>active</code> set to a ticked checkbox, <code>TRUE</code>, <code>Yes</code>, <code>Y</code>, <code>1</code> or <code>Open</code>. ROI inputs live in the repo at <code>campaigns/&lt;CODE&gt;.yaml</code>.</p></aside>
+<figure class="fig"><img src="images/survey-closed.png" alt="What a respondent sees on a closed or mistyped link" loading="lazy"><figcaption>What a respondent sees on a closed or mistyped link</figcaption></figure>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Closed-link message</th>
+<th>Cause</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"This link is missing its survey code"</td>
+<td>No <code>?code=</code> on the link</td>
+</tr>
+<tr>
+<td>"The survey code … was not recognized"</td>
+<td>Code not in the Campaigns tab</td>
+</tr>
+<tr>
+<td>"The survey … is currently closed"</td>
+<td>Campaign row is not active</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="5-where-responses-live">5. Where responses live</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Answers go straight into a private Google Sheet owned by the business account (ONI.GRC.ARC@gmail.com). Clients never see the Sheet. Nobody, including you, can tell who gave which answer.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Anonymity is designed in, not promised: no names, emails, IP addresses, device data or exact times are collected, only the date. Results for any group under 5 people are suppressed. This protects candor, which is what makes the diagnostic accurate.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>The <strong>Responses</strong> tab holds one row per response with the columns in <code>ARC_INSTRUMENT.columns</code> (metadata, behavioral keys, 45 item ids, <code>open_text</code>, <code>instrument_version</code>). <code>setup()</code> creates the tabs and refuses to rewrite a Responses tab that already holds data with different columns. Writes use a script lock so simultaneous submissions don't collide. Data handling rules are in <code>docs/DATA_PROTECTION.md</code>.</p></aside>
+<aside class="layer shot"><span class="layer-label">Screenshot to add</span><p>the Sheet's <strong>Responses</strong> tab with a few test rows (no real client data).</p></aside>
+<h2 id="6-scoring">6. Scoring</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Each person's answers are turned into a score from 0 to 100 for each of the 15 gaps, then grouped into the four parts of the framework. Low scores show where the organization is losing value. The tool also flags where managers think things are fine but staff disagree.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Severity bands: <strong>Critical</strong> &lt; 40, <strong>Significant</strong> 40–59, <strong>Moderate</strong> 60–74, <strong>Healthy</strong> ≥ 75. Maturity per pillar: 1 Imposed (0–19), 2 Tolerated (20–39), 3 Adopted (40–59), 4 Calibrated (60–79), 5 Integrated (80–100). A <strong>perception gap</strong> is flagged when managers and senior leaders score a dimension 15+ points above individual contributors. The top five gaps lead the readout.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>arc/scoring.py</code>. Reverse-coded items are flipped (6 − answer). Item means are taken per group (all, IC, leaders = MGR + SL); dimension index = (mean of item means − 1) ÷ 4 × 100; pillar index = mean of dimensions; overall = mean of pillars. Cleaning keeps a response only if it answers at least half the items, blanks values outside 1–5, and drops duplicate <code>response_id</code>s. Groups below <code>min_group_size</code> (5) return no score. The engine reproduces the Excel workbook's values exactly; <code>tests/test_engine.py</code> checks this on every push.</p></aside>
+<figure class="fig wide"><img src="images/scoring-flow.svg" alt="How answers become scores" loading="lazy"><figcaption>How answers become scores</figcaption></figure>
+<h2 id="7-the-value-leakage-roi-model">7. The Value Leakage (ROI) model</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>The tool estimates how much value the AI tools could deliver, how much is actually being realized, and what closing the gaps is worth in dollars per year. That number is what makes the business case for your engagement.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Achievable value V0 = N × H × (1 − v<em>) × W × T. Realized value = N × a × d × H × (1 − v) × c × W × T, where adoption </em>a<em>, depth </em>d<em> and verification drag </em>v<em> come from the survey and capture </em>c* is a proxy from item C1.3. Recoverable value = (target − current) + avoided error cost + avoided AI-related attrition. Proposals should quote the risk-adjusted figure (default 50% haircut).</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>arc/roi.py</code>. Inputs per campaign in <code>campaigns/&lt;CODE&gt;.yaml</code> under <code>roi:</code> (start from <code>campaigns/_TEMPLATE.yaml</code>). Under <code>overrides:</code>, leave a factor as <code>~</code> to use the survey value, or type a number to override it. If there is no <code>roi:</code> block, the report is produced without the ROI section. Survey-derived factors: adoption = share answering B1 "weekly" or more; depth = mean of B2; verification = mean of B3; capture = C1.3 mean ÷ 5.</p></aside>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Where it comes from</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Users (N), hours saved per week (H), loaded hourly cost (W)</td>
+<td>Client: license count, pilot data, finance</td>
+</tr>
+<tr>
+<td>Working weeks (T), healthy verification share (v*)</td>
+<td>Defaults 46 and 20%; agree with client</td>
+</tr>
+<tr>
+<td>Adoption, depth, verification, capture</td>
+<td>Survey (or override)</td>
+</tr>
+<tr>
+<td>Errors per year and cost per error</td>
+<td>Client incident log</td>
+</tr>
+<tr>
+<td>Turnover, AI-attributable share, salary, replacement cost</td>
+<td>Client HR data; assumption flagged</td>
+</tr>
+<tr>
+<td>Targets, haircut, engagement fee</td>
+<td>You</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="8-client-reports">8. Client reports</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>For each campaign the tool produces a readout page you can open in any browser, an Excel scorecard and a data file. They show maturity by pillar, the top five gaps, all 15 dimensions color-coded, how people use AI today, and the value leakage chart.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>The HTML report is the readout backbone: pillar maturity, overall index, top gaps, the dimension table (all / IC / leaders, perception gap, severity, benchmark position once five or more client campaigns exist), behavioral signals and the value waterfall with recoverable and risk-adjusted value, net first-year return and payback.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>arc/report.py</code> writes <code>reports/&lt;CODE&gt;/report.html</code> (self-contained), <code>scorecard.xlsx</code> and <code>scorecard.json</code>, plus <code>reports/SUMMARY.md</code> and <code>reports/benchmark_summary.json</code>. In GitHub they are uploaded as the run's artifact <code>arc-reports-&lt;run number&gt;</code> and kept 30 days. Suppressed campaigns show a warning and no scores.</p></aside>
+<figure class="fig"><img src="images/report-top.png" alt="Top of the demo report: maturity by pillar and top gaps" loading="lazy"><figcaption>Top of the demo report: maturity by pillar and top gaps</figcaption></figure>
+<figure class="fig"><img src="images/report-dimensions.png" alt="The dimension table with perception-gap flags" loading="lazy"><figcaption>The dimension table with perception-gap flags</figcaption></figure>
+<figure class="fig"><img src="images/report-leakage.png" alt="The value leakage section" loading="lazy"><figcaption>The value leakage section</figcaption></figure>
+<h2 id="9-the-nightly-run">9. The nightly run</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Every night GitHub reads the Sheet, scores every campaign, and makes fresh reports. You can also run it any time with one button.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Turnaround is next morning by default, or minutes on demand during a readout week. Each run's summary lists every campaign, its response count, whether it's suppressed and its overall index.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>.github/workflows/nightly.yml</code>, scheduled <code>17 10 * * *</code> (03:17 Pacific daylight time) and runnable from <strong>Actions → Nightly scoring → Run workflow</strong>, optionally for one campaign. Steps: install, check secrets (skips with a warning if <code>ARC_SHEET_ID</code> or <code>GOOGLE_SERVICE_ACCOUNT</code> are missing), score (<code>python -m arc run --source sheets</code>), upload reports, then commit <code>benchmark/summary.json</code>. The commit step rebases and retries, and warns instead of failing if it can't push. Runners are pinned to <code>ubuntu-24.04</code>.</p></aside>
+<aside class="layer shot"><span class="layer-label">Screenshot to add</span><p><strong>Actions → Nightly scoring</strong> run summary listing the campaigns.</p></aside>
+<h2 id="10-benchmark-across-clients">10. Benchmark across clients</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>As you run more clients, the tool builds a comparison: where a client sits against others on each gap. It uses only group-level scores, never individual answers.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Each non-suppressed client campaign contributes its dimension and pillar indexes. The benchmark reports count, mean, quartiles and median. Reports show a client's position (bottom quartile to top quartile) once five or more client campaigns exist. Over time this database is your strongest competitive asset.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>arc/benchmark.py</code> writes <code>benchmark/summary.json</code>. Campaigns starting <code>DEMO</code> or <code>TEST</code> are excluded. The nightly run commits the file to the repo, and a copy goes in each reports artifact.</p></aside>
+<h2 id="11-validation-statistics">11. Validation statistics</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>To call the survey "validated", you need statistics showing it measures what it claims. The tool calculates these automatically as consented responses build up, so validation happens as a by-product of client work.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Cronbach's alpha per dimension (target ≥ 0.70) with corrected item-total correlations (items under 0.30 flagged) and alpha-if-deleted, after 30 consented responses. Horn's parallel analysis and an exploratory factor analysis (principal-axis factoring, varimax) after 200 complete consented responses, with a structure-match rate: the share of items loading with their own dimension. Publishing these results is a strong sales asset; check IRB requirements first.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>arc/psychometrics.py</code>, numpy only. Only respondents who ticked the research box (<code>consent_research = 1</code>) are pooled, and <code>DEMO</code> and <code>TEST</code> campaigns are excluded. Results are written into <code>benchmark/summary.json</code> under <code>reliability</code> and <code>structure</code>.</p></aside>
+<h2 id="12-the-excel-workbook">12. The Excel workbook</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>An offline Excel version of the scoring and ROI model, for workshops and for clients who send you their own survey export.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Same scoring rules and ROI formulas as the engine, with blue input cells and yellow assumptions. Useful for live ROI conversations: change an input and the value leakage updates on the spot.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p><code>ARC_Diagnostic_and_ROI_Workbook.xlsx</code> (delivered separately). Paste responses into the <strong>Responses</strong> tab in the column order shown there. The engine and workbook produce identical results on the demo data.</p></aside>
+<h2 id="13-data-protection">13. Data protection</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>Clients' people answer honestly only if they trust the anonymity. The tool collects nothing that identifies anyone, hides small groups, and never puts individual answers in GitHub.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Contracts should cover purpose limitation, the anonymity rules, retention (raw responses deleted 12 months after the final readout unless agreed otherwise) and consent to include anonymized aggregates in the benchmark. Review comments before quoting any, and remove identifying details.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>See <code>docs/DATA_PROTECTION.md</code>. <code>.gitignore</code> blocks <code>reports/</code>, data files other than <code>data/demo/</code>, <code>.env</code> files and credential JSON. The service account has Viewer access to one Sheet and read-only Sheets scope.</p></aside>
+<h2 id="14-changing-the-instrument">14. Changing the instrument</h2>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>You can change the survey's wording or add questions, but changes must be deliberate, versioned, and kept comparable with past results.</p></aside>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>Don't change item ids or meanings once responses exist, or benchmarks stop being comparable. Any change bumps the instrument version and starts a new Responses tab.</p></aside>
+<aside class="layer tech"><span class="layer-label">Under the hood</span><p>Edit <code>instrument/items.yaml</code>, bump <code>instrument.version</code>, run <code>python -m arc build-collector</code>, run the tests, and commit. Then rename the Sheet's Responses tab (for example <code>Responses v1.0.0</code>), paste the new <code>Items.gs</code> into Apps Script, run <code>setup()</code>, and deploy a new version. See <a href="#module-9-update-the-survey">Module 9</a>.</p></aside>
+<h2 id="15-boundaries-what-the-tool-will-and-wont-do">15. Boundaries: what the tool will and won't do</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>The tool will</th>
+<th>The tool won't</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Measure people-side gaps and estimate the value at stake</td>
+<td>Prove causation or guarantee ROI</td>
+</tr>
+<tr>
+<td>Flag where leaders and staff see things differently</td>
+<td>Identify individuals, or let you</td>
+</tr>
+<tr>
+<td>Build reports and a benchmark automatically</td>
+<td>Decide the intervention: that's your judgment</td>
+</tr>
+<tr>
+<td>Accumulate validation statistics</td>
+<td>Claim the instrument is validated before the evidence exists</td>
+</tr>
+<tr>
+<td>Keep respondent data in your private Sheet</td>
+<td>Store raw responses in GitHub</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appendix-a-commands">Appendix A: Commands</h2>
+<p>Run from the repository folder (<code>pip install -r requirements-dev.txt</code> first).</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Command</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>python -m arc run --source sheets</code></td>
+<td>Score every campaign from the Google Sheet (needs the two secrets as environment variables)</td>
+</tr>
+<tr>
+<td><code>python -m arc run --source csv --path data/demo</code></td>
+<td>Score from CSV files (default; demo data)</td>
+</tr>
+<tr>
+<td><code>python -m arc run … --campaign ACME-2026Q4</code></td>
+<td>Score one campaign only</td>
+</tr>
+<tr>
+<td><code>python -m arc run … --out reports --benchmark benchmark/summary.json</code></td>
+<td>Choose output folder and benchmark file</td>
+</tr>
+<tr>
+<td><code>python -m arc build-collector</code></td>
+<td>Regenerate <code>collector/Items.gs</code> from <code>instrument/items.yaml</code></td>
+</tr>
+<tr>
+<td><code>python -m pytest -q</code></td>
+<td>Run the tests</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Apps Script functions</strong> (choose in the function menu, then <strong>Run</strong>):</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Function</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>setup</code></td>
+<td>Create the Responses and Campaigns tabs and header row; safe to re-run</td>
+</tr>
+<tr>
+<td><code>checkSetup</code></td>
+<td>Log tabs, campaign codes, active status and deployment notes</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appendix-b-workflows">Appendix B: Workflows</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Workflow</th>
+<th>File</th>
+<th>When it runs</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CI</td>
+<td><code>ci.yml</code></td>
+<td>Every push and pull request</td>
+<td>Tests, checks <code>Items.gs</code> is in sync, runs the demo end to end</td>
+</tr>
+<tr>
+<td>Nightly scoring</td>
+<td><code>nightly.yml</code></td>
+<td>Daily 03:17 Pacific, or <strong>Run workflow</strong></td>
+<td>Reads the Sheet, scores, uploads reports, commits the benchmark</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appendix-c-scoring-reference">Appendix C: Scoring reference</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Scale</td>
+<td>1 Strongly disagree · 2 Disagree · 3 Neither · 4 Agree · 5 Strongly agree</td>
+</tr>
+<tr>
+<td>Reverse-coded items</td>
+<td>A2.2, A3.2, R1.3, R3.2, R3.3, R4.3, C4.2, F1.2, F2.2</td>
+</tr>
+<tr>
+<td>Index</td>
+<td>(mean − 1) ÷ 4 × 100</td>
+</tr>
+<tr>
+<td>Severity</td>
+<td>Critical &lt; 40 · Significant 40–59 · Moderate 60–74 · Healthy ≥ 75</td>
+</tr>
+<tr>
+<td>Maturity</td>
+<td>1 Imposed · 2 Tolerated · 3 Adopted · 4 Calibrated · 5 Integrated (bands of 20)</td>
+</tr>
+<tr>
+<td>Perception gap</td>
+<td>Leaders − IC ≥ 15 points</td>
+</tr>
+<tr>
+<td>Minimum group size</td>
+<td>5</td>
+</tr>
+<tr>
+<td>Response counted</td>
+<td>At least 23 of 45 items answered</td>
+</tr>
+<tr>
+<td>Alpha target / item-total flag</td>
+<td>≥ 0.70 / &lt; 0.30</td>
+</tr>
+<tr>
+<td>EFA threshold</td>
+<td>200 complete consented responses</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="appendix-d-glossary">Appendix D: Glossary</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Term</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Campaign / wave</td>
+<td>One client survey round, identified by a code such as <code>ACME-2026Q4</code></td>
+</tr>
+<tr>
+<td>Dimension</td>
+<td>One of the 15 measured gaps (A1–F3)</td>
+</tr>
+<tr>
+<td>Pillar</td>
+<td>Acceptance, Reliance, Collaboration, or the Foundation</td>
+</tr>
+<tr>
+<td>Index</td>
+<td>A 0–100 score for a dimension or pillar</td>
+</tr>
+<tr>
+<td>Perception gap</td>
+<td>Leaders scoring a dimension 15+ points above individual contributors</td>
+</tr>
+<tr>
+<td>Suppressed</td>
+<td>Hidden because the group has fewer than 5 respondents</td>
+</tr>
+<tr>
+<td>Value leakage</td>
+<td>The difference between achievable and realized AI value</td>
+</tr>
+<tr>
+<td>Verification drag</td>
+<td>Share of AI-saved time spent re-checking or redoing outputs</td>
+</tr>
+<tr>
+<td>Capture</td>
+<td>Share of freed time redirected to valuable work</td>
+</tr>
+<tr>
+<td>Research consent</td>
+<td>The optional box allowing anonymous answers in aggregated research</td>
+</tr>
+<tr>
+<td>Benchmark</td>
+<td>Aggregated scores across client campaigns</td>
+</tr>
+<tr>
+<td>Artifact</td>
+<td>A file bundle attached to a GitHub Actions run (here, the reports)</td>
+</tr>
+<tr>
+<td>Secret</td>
+<td>An encrypted value stored in GitHub (here, the Sheet ID and service-account key)</td>
+</tr>
+<tr>
+<td>Service account</td>
+<td>A Google robot account with read-only access to the Sheet</td>
+</tr>
+<tr>
+<td>Deployment / web app URL</td>
+<td>The published version of the Apps Script survey and its <code>/exec</code> address</td>
+</tr>
+</tbody>
+</table></div>
+</section><section class="part" id="part-2"><h1 id="part-2-training-guide" data-part="part-2">Part 2: Training guide</h1>
+<p>A step-by-step walkthrough, from first setup to a client readout, using the demo campaign. Work through it in order the first time. Each module says what you'll do, why it matters, how to do it, and how to check it worked.</p>
+<p>You'll need:</p>
+<ul>
+<li>the business Google account (ONI.GRC.ARC@gmail.com), signed in <strong>alone</strong> in its own browser window or Chrome profile</li>
+<li>access to the repository <code>Baderholdjr/aderhold-arc</code></li>
+<li>about an hour for Modules 1–3; they're one-time</li>
+</ul>
+<p>You don't need a terminal. Every step can be done from Google and the GitHub website.</p>
+<figure class="fig wide"><img src="images/engagement-phases.svg" alt="Where each module fits in an engagement" loading="lazy"><figcaption>Where each module fits in an engagement</figcaption></figure>
+<h2 id="modules">Modules</h2>
+<ol start="0">
+<li><a href="#module-0-the-golden-rules">The golden rules</a></li>
+<li><a href="#module-1-set-up-the-survey">Set up the survey</a></li>
+<li><a href="#module-2-connect-github-to-the-sheet">Connect GitHub to the Sheet</a></li>
+<li><a href="#module-3-run-a-test-campaign">Run a test campaign</a></li>
+<li><a href="#module-4-launch-a-client-wave">Launch a client wave</a></li>
+<li><a href="#module-5-set-the-roi-inputs-with-the-client">Set the ROI inputs with the client</a></li>
+<li><a href="#module-6-read-a-client-report">Read a client report</a></li>
+<li><a href="#module-7-deliver-the-readout">Deliver the readout</a></li>
+<li><a href="#module-8-close-the-wave-and-re-measure">Close the wave and re-measure</a></li>
+<li><a href="#module-9-update-the-survey">Update the survey</a></li>
+<li><a href="#module-10-your-weekly-routine">Your weekly routine</a></li>
+</ol>
+<ul>
+<li><a href="#appendix-screenshots-to-add">Appendix: screenshots to add</a></li>
+</ul>
+<hr />
+<h2 id="module-0-the-golden-rules">Module 0: The golden rules</h2>
+<ol>
+<li><strong>Anonymity is non-negotiable.</strong> Never ask for names, never report a group under 5, never share the raw Sheet.</li>
+<li><strong>One account, one window.</strong> Do all Google setup signed in only as ONI.GRC.ARC@gmail.com. Several Google accounts in one browser cause "unable to open the file" errors.</li>
+<li><strong>The link ends <code>?code=</code>, never <code>?c=</code>.</strong> Google reserves <code>c</code>.</li>
+<li><strong>Change the source, not the output.</strong> Questions live in <code>instrument/items.yaml</code>; reports are rebuilt from the Sheet every night. Editing a report is lost at the next run.</li>
+<li><strong>After changing Apps Script, publish a new version.</strong> A deployment keeps serving the old code until you do.</li>
+<li><strong>Quote the risk-adjusted value.</strong> Under-promise in proposals; the re-measure proves the rest.</li>
+</ol>
+<h2 id="module-1-set-up-the-survey">Module 1: Set up the survey</h2>
+<p><strong>Goal:</strong> a working survey link that writes anonymous responses to your private Sheet.</p>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>you create one spreadsheet and attach the survey code to it. Google then gives you a public link anyone can open without signing in.</p></aside>
+<ol>
+<li><strong>Create the Sheet.</strong> At sheets.google.com, create a blank spreadsheet named <strong>Aderhold A.R.C. Responses</strong>.</li>
+<li><strong>Open Apps Script.</strong> In the Sheet: <strong>Extensions → Apps Script</strong>.</li>
+<li>
+<p><strong>Paste the four files.</strong> For each, open it on GitHub, click the copy icon at the top right of the code, and paste:</p>
+<ul>
+<li><code>Code.gs</code>: replace everything in the default file (<code>collector/Code.gs</code>)</li>
+<li><code>Items</code>: <strong>+ → Script</strong>, name it <code>Items</code> (<code>collector/Items.gs</code>)</li>
+<li><code>Survey</code>: <strong>+ → HTML</strong>, name it exactly <code>Survey</code>, capital S (<code>collector/Survey.html</code>)</li>
+<li><code>appsscript.json</code>: first tick <strong>Project Settings → Show "appsscript.json"</strong>, then replace it (<code>collector/appsscript.json</code>)</li>
+</ul>
+<p>Click <strong>Save</strong>.</p>
+</li>
+<li>
+<p><strong>Run setup.</strong> Choose <strong>setup</strong> in the function menu and click <strong>Run</strong>. Google warns that the app isn't verified, because it's your own script: click <strong>Advanced → Go to (project) → Allow</strong>.</p>
+</li>
+<li>
+<p><strong>Deploy.</strong> <strong>Deploy → New deployment →</strong> gear <strong>→ Web app</strong>. Set <em>Execute as:</em> <strong>Me</strong>, <em>Who has access:</em> <strong>Anyone</strong>. Click <strong>Deploy</strong> and copy the <strong>Web app URL</strong> (ends in <code>/exec</code>) with the <strong>Copy</strong> button.</p>
+<aside class="layer shot"><span class="layer-label">Screenshot to add</span><p>the <strong>New deployment</strong> dialog with <em>Execute as: Me</em> and <em>Who has access: Anyone</em>.</p></aside>
+</li>
+</ol>
+<p><strong>Check it worked:</strong></p>
+<ul>
+<li>The Sheet now has <strong>Responses</strong> and <strong>Campaigns</strong> tabs, with <code>TEST-0001</code> active in Campaigns.</li>
+<li>In a private/incognito window, <code>&lt;Web app URL&gt;?code=TEST-0001</code> shows the welcome screen.</li>
+</ul>
+<h2 id="module-2-connect-github-to-the-sheet">Module 2: Connect GitHub to the Sheet</h2>
+<p><strong>Goal:</strong> the nightly run can read the Sheet, read-only.</p>
+<aside class="layer plain"><span class="layer-label">In plain terms</span><p>you create a robot Google account that can only look at this one Sheet, and give its key to GitHub in a locked box.</p></aside>
+<ol>
+<li><strong>Create a Google Cloud project.</strong> At console.cloud.google.com (as ONI.GRC.ARC), create a project named <code>aderhold-arc</code> and select it. Skip any billing prompt; nothing here needs it.</li>
+<li><strong>Enable the Sheets API.</strong> Search <strong>Google Sheets API</strong> and click <strong>Enable</strong>.</li>
+<li><strong>Create the service account.</strong> Search <strong>Service Accounts → Create service account</strong>, name <code>arc-reader</code>, <strong>Create and continue → Done</strong> (no roles).</li>
+<li><strong>Create a key.</strong> Open the account → <strong>Keys → Add key → Create new key → JSON</strong>. A <code>.json</code> file downloads. Treat it like a password.</li>
+<li><strong>Share the Sheet.</strong> In the Sheet, click <strong>Share</strong>, paste the service account's email, set <strong>Viewer</strong>, untick <em>Notify</em>, and click <strong>Share</strong>.</li>
+<li>
+<p><strong>Add the GitHub secrets.</strong> In the repository: <strong>Settings → Secrets and variables → Actions → New repository secret</strong>:</p>
+<ul>
+<li><code>ARC_SHEET_ID</code>: the long part of the Sheet's address between <code>/d/</code> and <code>/edit</code></li>
+<li><code>GOOGLE_SERVICE_ACCOUNT</code>: the entire contents of the <code>.json</code> file</li>
+</ul>
+<aside class="layer shot"><span class="layer-label">Screenshot to add</span><p>the <strong>Actions secrets</strong> page listing <code>ARC_SHEET_ID</code> and <code>GOOGLE_SERVICE_ACCOUNT</code>.</p></aside>
+</li>
+<li>
+<p><strong>Delete the key file</strong> from your computer, or store it in a password manager.</p>
+</li>
+</ol>
+<p><strong>Check it worked:</strong> <strong>Actions → Nightly scoring → Run workflow</strong>. The run is green and its summary lists <code>TEST-0001</code>.</p>
+<h2 id="module-3-run-a-test-campaign">Module 3: Run a test campaign</h2>
+<p><strong>Goal:</strong> see a complete report before any client does.</p>
+<ol>
+<li><strong>Submit test responses.</strong> Open <code>&lt;Web app URL&gt;?code=TEST-0001</code> in a private window and complete the survey at least 10 times: at least 5 as <em>Individual contributor</em> and 5 as <em>People manager</em> or <em>Senior leader</em>, so both group columns appear. Vary your answers.</li>
+<li><strong>Give TEST-0001 ROI inputs</strong> (optional). In GitHub, copy <code>campaigns/_TEMPLATE.yaml</code> to <code>campaigns/TEST-0001.yaml</code> (<strong>Add file → Create new file</strong>, paste, edit <code>client:</code>) and commit.</li>
+<li><strong>Run the workflow.</strong> <strong>Actions → Nightly scoring → Run workflow</strong>, optionally entering <code>TEST-0001</code> as the campaign.</li>
+<li><strong>Download the report.</strong> Open the run, scroll to <strong>Artifacts</strong>, and download <code>arc-reports-…</code>. Open <code>TEST-0001/report.html</code>.</li>
+</ol>
+<p><strong>Check it worked:</strong> the report shows pillar maturity, top gaps and all 15 dimensions with IC and leaders columns filled. With fewer than 5 responses it says <em>suppressed</em>, which is correct.</p>
+<h2 id="module-4-launch-a-client-wave">Module 4: Launch a client wave</h2>
+<p><strong>Goal:</strong> a live, client-specific survey link.</p>
+<ol>
+<li><strong>Pick a code:</strong> client short name plus period, for example <code>ACME-2026Q4</code>.</li>
+<li><strong>Activate it.</strong> In the Sheet's <strong>Campaigns</strong> tab add a row: <code>code</code> <code>ACME-2026Q4</code>, <code>display_name</code> <code>Acme</code> (shown on the survey header), <code>active</code> <code>TRUE</code>.</li>
+<li><strong>Create the campaign file.</strong> In GitHub, create <code>campaigns/ACME-2026Q4.yaml</code> from <code>_TEMPLATE.yaml</code> with the client name and survey dates. ROI inputs can wait for Module 5.</li>
+<li><strong>Test the link</strong> in a private window: <code>&lt;Web app URL&gt;?code=ACME-2026Q4</code>. The header shows <em>For Acme</em>.</li>
+<li>
+<p><strong>Send it through the sponsor.</strong> The client's executive sponsor sends the link, not you. Suggested message:</p>
+<blockquote>
+<p>We're running a short, anonymous survey (about 12 minutes) on how AI tools are working for you and your team. There are no right answers. Nobody, including the consultant, can see who said what, and results are only reported for groups of 5 or more. Please complete it by [date]: [link]</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Plan for response rate.</strong> Aim for 60%+ of AI-affected staff, with a reminder from the sponsor at the halfway point.</p>
+</li>
+</ol>
+<h2 id="module-5-set-the-roi-inputs-with-the-client">Module 5: Set the ROI inputs with the client</h2>
+<p><strong>Goal:</strong> a value estimate the client's finance team will accept.</p>
+<ol>
+<li><strong>Gather the client numbers:</strong> licensed users, loaded hourly cost, AI tool cost, expected hours saved per week (from their pilot or vendor), material AI errors per year and their typical cost, voluntary turnover and average salary.</li>
+<li><strong>Agree the assumptions</strong> out loud: healthy verification share (default 20%), the AI-attributable share of turnover (default 10%), targets and the confidence haircut (default 50%).</li>
+<li><strong>Edit <code>campaigns/&lt;CODE&gt;.yaml</code></strong> under <code>roi:</code>. Leave the four <code>overrides:</code> as <code>~</code> so the survey supplies adoption, depth, verification and capture; override only with better data, such as license telemetry for adoption.</li>
+<li><strong>Re-run</strong> the workflow for that campaign.</li>
+</ol>
+<aside class="layer practice"><span class="layer-label">For A.R.C. practitioners</span><p>use the client's own numbers wherever they exist. A defensible conservative estimate beats a large one; the re-measure in Module 8 is what proves value.</p></aside>
+<h2 id="module-6-read-a-client-report">Module 6: Read a client report</h2>
+<p><strong>Goal:</strong> know what the report is telling you before you present it.</p>
+<ol>
+<li><strong>Start with the pillar cards.</strong> The lowest pillar is your headline. Level 2 (<em>Tolerated</em>) or below is common in early rollouts.</li>
+<li><strong>Read the top five gaps.</strong> These usually become the Activation Sprint scope.</li>
+<li><strong>Scan the Flag column.</strong> Every <em>Perception gap</em> is a conversation: leaders believe something is solved that staff say isn't. These land hard in readouts; present them as a shared blind spot, not blame.</li>
+<li><strong>Check the behavioral signals.</strong> Under 5 training hours and high own-time learning together confirm an onboarding deficit (A3). High re-checking with low R4 points to a trust collapse after errors.</li>
+<li><strong>Read the value waterfall.</strong> The biggest red bar is where the money is. Early rollouts lose most at adoption and depth; mature ones at re-checking and capture.</li>
+</ol>
+<figure class="fig"><img src="images/report-dimensions.png" alt="Reading the dimension table" loading="lazy"><figcaption>Reading the dimension table</figcaption></figure>
+<h2 id="module-7-deliver-the-readout">Module 7: Deliver the readout</h2>
+<p><strong>Goal:</strong> a decision on next steps.</p>
+<ol>
+<li><strong>Structure (45–60 minutes):</strong> the headline (pillar maturity and value at stake) · top gaps with the evidence · perception gaps · recommended interventions · 90-day roadmap · decision.</li>
+<li><strong>Map gaps to interventions</strong> using the playbook's catalog. For example: A3 → M3 Role-Based Onboarding; R3/R4 → M6 Proportionate Verification and M7 the flop protocol; F1/F2 → M11 Governance for Leaders; C2 → M8 the AI Direction Ladder.</li>
+<li><strong>Quote the risk-adjusted value</strong> and the engagement fee side by side.</li>
+<li><strong>Share the report</strong> as the HTML file or the Excel scorecard. Never share the Sheet or comments that could identify anyone.</li>
+</ol>
+<h2 id="module-8-close-the-wave-and-re-measure">Module 8: Close the wave and re-measure</h2>
+<p><strong>Goal:</strong> proof that the work moved the numbers.</p>
+<ol>
+<li><strong>Close the wave:</strong> set <code>active</code> to <code>FALSE</code> in the Campaigns tab. The link then shows "currently closed".</li>
+<li><strong>Keep the final report:</strong> download the artifact and file it with the client's engagement records; artifacts expire after 30 days.</li>
+<li><strong>Re-measure 3–6 months later</strong> with a new code (<code>ACME-2027Q1</code>) and the same population. Compare indexes, and put the realized-value change into the case study.</li>
+</ol>
+<h2 id="module-9-update-the-survey">Module 9: Update the survey</h2>
+<p><strong>Goal:</strong> a change to the Apps Script code or the questions, live without breaking anything.</p>
+<ol>
+<li><strong>Code-only change</strong> (for example a fix to <code>Code.gs</code> or <code>Survey.html</code>): paste the new file into Apps Script, <strong>Save</strong>, then <strong>Deploy → Manage deployments → pencil → Version: New version → Deploy</strong>. The URL stays the same.</li>
+<li><strong>Question change:</strong> follow <a href="#14-changing-the-instrument">Product guide §14</a>. In short: edit <code>items.yaml</code>, bump the version, <code>build-collector</code>, rename the old Responses tab, paste the new <code>Items.gs</code>, run <code>setup</code>, and deploy a new version.</li>
+</ol>
+<p><strong>Check it worked:</strong> open a test link in a private window and confirm the change.</p>
+<h2 id="module-10-your-weekly-routine">Module 10: Your weekly routine</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>When</th>
+<th>What</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Monday</td>
+<td>Check <strong>Actions</strong>: last night's run is green; note any warnings</td>
+</tr>
+<tr>
+<td>During a live wave</td>
+<td>Look at response counts in the run summary; ask the sponsor for a reminder if under target</td>
+</tr>
+<tr>
+<td>After a wave closes</td>
+<td>Download the artifact; build the readout</td>
+</tr>
+<tr>
+<td>Monthly</td>
+<td>Review <code>benchmark/summary.json</code>: campaigns included, reliability status</td>
+</tr>
+<tr>
+<td>Quarterly</td>
+<td>Re-verify statistics quoted in sales materials; plan re-measures</td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="appendix-screenshots-to-add">Appendix: screenshots to add</h2>
+<p>These screens sit behind a Google or GitHub sign-in. Capture each one from your own account, save it in <code>docs/manual/images/</code> under the name given, and replace the matching "Screenshot to add" note with <code>![caption](images/&lt;name&gt;)</code>.</p>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Screen</th>
+<th>Save as</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>The Sheet's <strong>Responses</strong> tab with test rows</td>
+<td><code>g-responses.png</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Apps Script <strong>New deployment</strong> dialog (Web app, Me, Anyone)</td>
+<td><code>g-deploy.png</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>GitHub <strong>Settings → Secrets and variables → Actions</strong> listing both secrets</td>
+<td><code>gh-secrets.png</code></td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>Actions → Nightly scoring</strong> run summary</td>
+<td><code>gh-nightly.png</code></td>
+</tr>
+<tr>
+<td>5</td>
+<td>The run's <strong>Artifacts</strong> section</td>
+<td><code>gh-artifacts.png</code></td>
+</tr>
+<tr>
+<td>6</td>
+<td>Apps Script <strong>Execution log</strong> after <code>checkSetup</code></td>
+<td><code>g-checksetup.png</code></td>
+</tr>
+</tbody>
+</table></div>
+</section><section class="part" id="part-3"><h1 id="part-3-troubleshooting-guide" data-part="part-3">Part 3: Troubleshooting guide</h1>
+<p>Find your symptom in the index, then follow the entry. Each entry gives:</p>
+<ul>
+<li><strong>What you see:</strong> the message or behaviour</li>
+<li><strong>Why:</strong> the cause in plain terms</li>
+<li><strong>Fix:</strong> the steps</li>
+</ul>
+<p>Entries marked <strong>(seen in the pilot)</strong> happened while setting up the system in October 2026, so the fix is proven.</p>
+<h2 id="before-anything-else">Before anything else</h2>
+<ol>
+<li><strong>Read the exact message.</strong> The survey's closed-link page and <code>checkSetup</code> say what's wrong.</li>
+<li><strong>Use a private window, signed in as nobody</strong>, to test what respondents see.</li>
+<li><strong>Find the failed step.</strong> In <strong>Actions</strong>, open the failed run, click the job, then expand the step with the red ✗. The last lines usually say what happened.</li>
+<li><strong>Re-run.</strong> Some failures are transient (<strong>Re-run all jobs</strong>).</li>
+</ol>
+<h2 id="index">Index</h2>
+<div class="tbl"><table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Entry</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>"Sorry, unable to open the file at this time" on every link with a code</td>
+<td><a href="#t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code">T-01</a></td>
+</tr>
+<tr>
+<td>"Sorry, unable to open the file" on the link <code>checkSetup</code> printed</td>
+<td><a href="#t-02-the-link-ends-in-dev">T-02</a></td>
+</tr>
+<tr>
+<td>"Sorry, unable to open the file" only in your normal browser</td>
+<td><a href="#t-03-several-google-accounts-in-one-browser">T-03</a></td>
+</tr>
+<tr>
+<td>Survey won't open from a Workspace or email-verified account</td>
+<td><a href="#t-04-workspace-or-email-verified-account">T-04</a></td>
+</tr>
+<tr>
+<td>"This survey link is not active"</td>
+<td><a href="#t-05-this-survey-link-is-not-active">T-05</a></td>
+</tr>
+<tr>
+<td>"No HTML file named Survey was found"</td>
+<td><a href="#t-06-no-html-file-named-survey">T-06</a></td>
+</tr>
+<tr>
+<td>Changes to the survey don't appear</td>
+<td><a href="#t-07-changes-dont-appear">T-07</a></td>
+</tr>
+<tr>
+<td>"Google hasn't verified this app"</td>
+<td><a href="#t-08-google-hasnt-verified-this-app">T-08</a></td>
+</tr>
+<tr>
+<td><code>setup</code> says the Responses tab has different columns</td>
+<td><a href="#t-09-setup-refuses-different-columns">T-09</a></td>
+</tr>
+<tr>
+<td>Respondent sees "Please answer at least half…" or "Please select your role"</td>
+<td><a href="#t-10-a-respondent-cant-submit">T-10</a></td>
+</tr>
+<tr>
+<td>Nightly run says secrets are not set</td>
+<td><a href="#t-11-secrets-not-set">T-11</a></td>
+</tr>
+<tr>
+<td>Nightly run fails reading the Sheet</td>
+<td><a href="#t-12-the-run-cant-read-the-sheet">T-12</a></td>
+</tr>
+<tr>
+<td>"Sheet has columns the instrument does not define"</td>
+<td><a href="#t-13-unknown-sheet-columns">T-13</a></td>
+</tr>
+<tr>
+<td>Nightly run fails at "Commit refreshed benchmark"</td>
+<td><a href="#t-14-the-benchmark-commit-fails">T-14</a></td>
+</tr>
+<tr>
+<td>"Node.js 20 is deprecated" warning</td>
+<td><a href="#t-15-nodejs-20-deprecated">T-15</a></td>
+</tr>
+<tr>
+<td>Report says <em>suppressed</em> or shows <em>n&lt;5</em></td>
+<td><a href="#t-16-suppressed-or-n5">T-16</a></td>
+</tr>
+<tr>
+<td>Report has no Value leakage section / "ROI skipped"</td>
+<td><a href="#t-17-no-value-leakage-section">T-17</a></td>
+</tr>
+<tr>
+<td>CI fails: "collector/Items.gs is out of date"</td>
+<td><a href="#t-18-itemsgs-out-of-date">T-18</a></td>
+</tr>
+<tr>
+<td>A campaign is missing from the run summary</td>
+<td><a href="#t-19-a-campaign-is-missing">T-19</a></td>
+</tr>
+<tr>
+<td>Artifacts are gone</td>
+<td><a href="#t-20-artifacts-expired">T-20</a></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<h2 id="survey-link">Survey link</h2>
+<h3 id="t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code">T-01: "Sorry, unable to open the file" on every link with a code</h3>
+<p><strong>What you see:</strong> Google's page <em>Sorry, unable to open the file at this time. Please check the address and try again.</em> on any link ending <code>?c=…</code>, even in a private window, while the bare <code>/exec</code> link opens. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Why:</strong> Google reserves the URL parameters <code>c</code> and <code>sid</code> for Apps Script. Any web app link using them is rejected before your code runs.</p>
+<p><strong>Fix:</strong> use <code>?code=</code>. Make sure Apps Script has the current <code>Code.gs</code> (it reads <code>e.parameter.code</code>) and you've deployed a new version.</p>
+<h3 id="t-02-the-link-ends-in-dev">T-02: The link ends in /dev</h3>
+<p><strong>What you see:</strong> the same Google error, on a link ending <code>/dev</code>. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Why:</strong> <code>/dev</code> is the private test link. Only the owner can open it, signed in. When <code>checkSetup</code> runs in the editor, Google reports this link.</p>
+<p><strong>Fix:</strong> get the public link from <strong>Deploy → Manage deployments → (your deployment) → Web app URL → Copy</strong>. It ends in <code>/exec</code> and has a different, longer ID. Don't just change <code>/dev</code> to <code>/exec</code>.</p>
+<h3 id="t-03-several-google-accounts-in-one-browser">T-03: Several Google accounts in one browser</h3>
+<p><strong>What you see:</strong> the Google error in your normal browser, but the survey works in a private window.</p>
+<p><strong>Why:</strong> a known Apps Script problem when more than one Google account is signed in.</p>
+<p><strong>Fix:</strong> test in a private window, or use a Chrome profile signed in only as ONI.GRC.ARC. Respondents are rarely affected.</p>
+<h3 id="t-04-workspace-or-email-verified-account">T-04: Workspace or email-verified account</h3>
+<p><strong>What you see:</strong> the survey won't open for outsiders when the project is owned by a Google Workspace or email-verified Workspace account. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Why:</strong> Workspace sharing settings can block anonymous access. In the pilot, the root cause turned out to be <a href="#t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code">T-01</a>, but the project was moved to a dedicated Gmail account anyway, to keep business data off personal accounts.</p>
+<p><strong>Fix:</strong> own the Sheet and Apps Script with ONI.GRC.ARC@gmail.com. If you must use Workspace: <strong>Admin console → Apps → Google Workspace → Drive and Docs → Sharing settings → Sharing options</strong> → allow sharing outside the organization.</p>
+<h3 id="t-05-this-survey-link-is-not-active">T-05: "This survey link is not active"</h3>
+<p><strong>What you see:</strong> the survey's own closed page. It states the reason. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Fix by reason:</strong></p>
+<ul>
+<li><em>Missing its survey code:</em> add <code>?code=&lt;CODE&gt;</code> to the link.</li>
+<li><em>Code not recognized:</em> add the code to the Campaigns tab, spelled the same (case doesn't matter).</li>
+<li><em>Currently closed:</em> set <code>active</code> to <code>TRUE</code> (or tick the box).</li>
+</ul>
+<p>Run <code>checkSetup</code> to see exactly what the script sees.</p>
+<h3 id="t-06-no-html-file-named-survey">T-06: "No HTML file named Survey"</h3>
+<p><strong>What you see:</strong> an Apps Script error mentioning <code>Survey</code>. <strong>(Seen in the pilot:</strong> a file was created as <code>survey.html</code>; renaming it to <code>Survey</code> prevents this error.)</p>
+<p><strong>Why:</strong> file names are case-sensitive; the code loads <code>Survey</code>.</p>
+<p><strong>Fix:</strong> in Apps Script, hover over the file, <strong>⋮ → Rename</strong> to <code>Survey</code>, <strong>Save</strong>, and deploy a new version.</p>
+<h3 id="t-07-changes-dont-appear">T-07: Changes don't appear</h3>
+<p><strong>What you see:</strong> you pasted new code, but the live survey behaves the old way.</p>
+<p><strong>Why:</strong> a deployment serves a frozen version of your files.</p>
+<p><strong>Fix:</strong> <strong>Deploy → Manage deployments → pencil → Version: New version → Deploy</strong>. The URL doesn't change.</p>
+<h3 id="t-08-google-hasnt-verified-this-app">T-08: "Google hasn't verified this app"</h3>
+<p><strong>What you see:</strong> a warning when you run <code>setup</code> or deploy for the first time.</p>
+<p><strong>Why:</strong> it's your own unpublished script. Respondents never see this.</p>
+<p><strong>Fix:</strong> <strong>Advanced → Go to (project name) (unsafe) → Allow</strong>. The script asks only for access to this one spreadsheet.</p>
+<h3 id="t-09-setup-refuses-different-columns">T-09: setup refuses: different columns</h3>
+<p><strong>What you see:</strong> <em>Responses tab already has data with different columns.</em></p>
+<p><strong>Why:</strong> the instrument changed while old responses exist. Mixing versions would corrupt scoring.</p>
+<p><strong>Fix:</strong> rename the existing tab (for example <code>Responses v1.0.0</code>) and run <code>setup</code> again.</p>
+<h3 id="t-10-a-respondent-cant-submit">T-10: A respondent can't submit</h3>
+<p><strong>What you see:</strong> <em>Please answer at least half of the statements</em> or <em>Please select your role.</em></p>
+<p><strong>Why:</strong> responses with too little data can't be scored, and role drives the leaders vs. IC comparison.</p>
+<p><strong>Fix:</strong> none needed; the respondent goes back and completes it. If many people report it, check the sponsor's message explains that every question can be skipped except role.</p>
+<h2 id="nightly-run">Nightly run</h2>
+<h3 id="t-11-secrets-not-set">T-11: Secrets not set</h3>
+<p><strong>What you see:</strong> the run finishes with the warning <em>ARC_SHEET_ID / GOOGLE_SERVICE_ACCOUNT secrets are not set yet.</em></p>
+<p><strong>Fix:</strong> complete <a href="#module-2-connect-github-to-the-sheet">Module 2</a>, step 6. Secret names must match exactly.</p>
+<h3 id="t-12-the-run-cant-read-the-sheet">T-12: The run can't read the Sheet</h3>
+<p><strong>What you see:</strong> <em>Score campaigns</em> fails with <code>PERMISSION_DENIED</code>, <code>SpreadsheetNotFound</code> or <code>403</code>, or a JSON error.</p>
+<p><strong>Why:</strong> the Sheet isn't shared with the service account, the Sheet ID is wrong, the Sheets API isn't enabled, or the key was pasted incompletely.</p>
+<p><strong>Fix:</strong></p>
+<ol>
+<li>In the Sheet's <strong>Share</strong> list, check the <code>arc-reader@…</code> email is there as Viewer.</li>
+<li>Check <code>ARC_SHEET_ID</code> is only the ID, not the whole URL.</li>
+<li>Check the <strong>Google Sheets API</strong> is enabled in the Cloud project.</li>
+<li>Re-paste <code>GOOGLE_SERVICE_ACCOUNT</code> with the whole file, from <code>{</code> to <code>}</code>.</li>
+</ol>
+<h3 id="t-13-unknown-sheet-columns">T-13: Unknown Sheet columns</h3>
+<p><strong>What you see:</strong> <em>Sheet has columns the instrument does not define.</em></p>
+<p><strong>Why:</strong> someone added or renamed a column in the Responses tab, or the Sheet is on a newer instrument than the repo.</p>
+<p><strong>Fix:</strong> undo the column change in the Sheet, or update <code>instrument/items.yaml</code> in the repo to match the deployed version.</p>
+<h3 id="t-14-the-benchmark-commit-fails">T-14: The benchmark commit fails</h3>
+<p><strong>What you see:</strong> the run is red at <em>Commit refreshed benchmark</em>, though scoring and reports succeeded. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Why:</strong> the repository changed while the run was working, so the push was rejected.</p>
+<p><strong>Fix:</strong> already fixed. The step now rebases, retries and warns instead of failing. If the warning repeats, check <strong>Settings → Actions → General → Workflow permissions</strong> is <em>Read and write</em>. The benchmark is still in the reports artifact.</p>
+<h3 id="t-15-nodejs-20-deprecated">T-15: Node.js 20 deprecated</h3>
+<p><strong>What you see:</strong> a warning that actions target Node.js 20. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Fix:</strong> already fixed; the workflows use the v6 actions on Node 24. If it returns after a GitHub change, bump <code>actions/checkout</code>, <code>actions/setup-python</code> and <code>actions/upload-artifact</code> to their latest major versions.</p>
+<h2 id="reports">Reports</h2>
+<h3 id="t-16-suppressed-or-n5">T-16: Suppressed or n&lt;5</h3>
+<p><strong>What you see:</strong> <em>Fewer than 5 responses: results suppressed</em>, or <em>n&lt;5</em> in the IC or Leaders columns. <strong>(Seen in the pilot.)</strong></p>
+<p><strong>Why:</strong> the anonymity rule working as designed.</p>
+<p><strong>Fix:</strong> collect more responses. For leaders vs. IC comparisons, each group needs 5 or more.</p>
+<h3 id="t-17-no-value-leakage-section">T-17: No Value leakage section</h3>
+<p><strong>What you see:</strong> the report has scores but no ROI section, or the run log says <em>ROI skipped</em>.</p>
+<p><strong>Why:</strong> there is no <code>campaigns/&lt;CODE&gt;.yaml</code> with a <code>roi:</code> block, or a factor has neither a survey value nor an override.</p>
+<p><strong>Fix:</strong> create the campaign file from the template (<a href="#module-5-set-the-roi-inputs-with-the-client">Module 5</a>) and re-run.</p>
+<h3 id="t-18-itemsgs-out-of-date">T-18: Items.gs out of date</h3>
+<p><strong>What you see:</strong> CI fails with <em>collector/Items.gs is out of date.</em></p>
+<p><strong>Why:</strong> <code>instrument/items.yaml</code> changed without regenerating the survey's question file.</p>
+<p><strong>Fix:</strong> run <code>python -m arc build-collector</code>, commit <code>collector/Items.gs</code>, and paste it into Apps Script.</p>
+<h3 id="t-19-a-campaign-is-missing">T-19: A campaign is missing</h3>
+<p><strong>What you see:</strong> a campaign with responses isn't in the run summary.</p>
+<p><strong>Why:</strong> its responses were dropped in cleaning (under half the items answered), or the code in the Sheet differs from the one you expect.</p>
+<p><strong>Fix:</strong> look at the <code>campaign</code> column in the Responses tab; codes are stored upper case.</p>
+<h3 id="t-20-artifacts-expired">T-20: Artifacts expired</h3>
+<p><strong>What you see:</strong> an old run's <strong>Artifacts</strong> section is empty.</p>
+<p><strong>Why:</strong> reports are kept 30 days, deliberately.</p>
+<p><strong>Fix:</strong> re-run the workflow for that campaign; reports rebuild from the Sheet. Download and file final reports at the end of each wave.</p>
+<h2 id="when-you-need-help">When you need help</h2>
+<p>Collect: the run link (or the survey link and the exact message), what you expected, and the <code>checkSetup</code> log. Never send respondent data or the service-account key.</p>
+</section>
+</main></div>

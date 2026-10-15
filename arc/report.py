@@ -82,16 +82,16 @@ def to_html(score: CampaignScore, roi: RoiResult | None, client: str, bench: dic
 
     roi_html = ""
     if roi:
-        mx = (roi.achievable_value or 1) / 0.8  # leave room for value labels
+        mx = (roi.achievable_value or 1) / 0.8  # bars use at most 80% of the track; labels sit to their right
         bars = ""
         for w in roi.waterfall:
             if w["lost"] is None:
-                bars += (f"<div class='wf'><span class='wl'>{e(w['step'])}</span><span class='bar total' "
-                         f"style='width:{w['running'] / mx * 100:.1f}%'></span><span>{_f(w['running'], money=True)}</span></div>")
+                left, width, cls, label = 0.0, w["running"] / mx * 100, "total", _f(w["running"], money=True)
             else:
-                bars += (f"<div class='wf'><span class='wl'>{e(w['step'])}</span><span class='bar lost' "
-                         f"style='margin-left:{w['running'] / mx * 100:.1f}%;width:{w['lost'] / mx * 100:.1f}%'></span>"
-                         f"<span>-{_f(w['lost'], money=True)}</span></div>")
+                left, width, cls, label = w["running"] / mx * 100, w["lost"] / mx * 100, "lost", "-" + _f(w["lost"], money=True)
+            bars += (f"<div class='wf'><span class='wl'>{e(w['step'])}</span><span class='track'>"
+                     f"<span class='bar {cls}' style='left:{left:.1f}%;width:{width:.1f}%'></span>"
+                     f"<span class='wv' style='left:calc({left + width:.1f}% + 6px)'>{label}</span></span></div>")
         roi_html = f"""
 <h2>Value leakage</h2>
 <p>People-side gaps let through <b>{_f(roi.share_realized, 1, pct=True)}</b> of achievable AI value
@@ -117,7 +117,8 @@ th{{background:#1f3a5f;color:#fff;text-align:left;padding:6px}} td{{padding:5px 
 .pills{{display:flex;gap:12px;flex-wrap:wrap}} .pill{{flex:1;min-width:180px;border:1px solid #cfd7e0;border-radius:8px;padding:12px}}
 .pn{{font-weight:700}} .pv{{font-size:30px;font-weight:700;color:#1f3a5f}} .pl{{color:#5b6b7c;font-size:13px}}
 .wf{{display:flex;align-items:center;gap:8px;font-size:13px;margin:4px 0}} .wl{{width:170px;flex:none}}
-.wfbox .bar{{display:inline-block;height:16px;flex:none}} .total{{background:#9aa5b1}} .lost{{background:#e6a19a}}
+.track{{position:relative;flex:1;height:18px}} .wfbox .bar{{position:absolute;top:1px;height:16px}} .wv{{position:absolute;top:0;white-space:nowrap}}
+.total{{background:#9aa5b1}} .lost{{background:#e6a19a}}
 .kv td:first-child{{width:60%}} .note{{color:#5b6b7c;font-size:12px}} .warn{{color:#c0392b;font-weight:700}}
 </style></head><body>
 <h1>Aderhold A.R.C. Scorecard</h1>

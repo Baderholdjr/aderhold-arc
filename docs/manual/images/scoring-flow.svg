@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 240" font-family="IBM Plex Sans, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-label="How answers become scores">
+<defs><marker id="b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#5b6b75"/></marker></defs>
+<rect width="760" height="240" fill="#ffffff"/>
+<text x="24" y="30" font-size="15" font-weight="600" fill="#183b4e">Answers become a 0-100 index, then a severity and a maturity level</text>
+<g font-size="12.5" fill="#1b2a33">
+<rect x="24" y="56" width="126" height="86" rx="8" fill="#fff" stroke="#5b6b75"/>
+<text x="87" y="82" text-anchor="middle" font-weight="600">45 answers</text><text x="87" y="100" text-anchor="middle" font-size="11.5" fill="#5b6b75">1 = strongly disagree</text><text x="87" y="116" text-anchor="middle" font-size="11.5" fill="#5b6b75">5 = strongly agree</text>
+<rect x="172" y="56" width="126" height="86" rx="8" fill="#fff" stroke="#5b6b75"/>
+<text x="235" y="82" text-anchor="middle" font-weight="600">Flip reversed</text><text x="235" y="100" text-anchor="middle" font-size="11.5" fill="#5b6b75">9 items: 6 - answer</text><text x="235" y="116" text-anchor="middle" font-size="11.5" fill="#5b6b75">(e.g. "I worry…")</text>
+<rect x="320" y="56" width="126" height="86" rx="8" fill="#fff" stroke="#5b6b75"/>
+<text x="383" y="82" text-anchor="middle" font-weight="600">Item means</text><text x="383" y="100" text-anchor="middle" font-size="11.5" fill="#5b6b75">all, IC, leaders</text><text x="383" y="116" text-anchor="middle" font-size="11.5" fill="#5b6b75">groups of 5+ only</text>
+<rect x="468" y="56" width="126" height="86" rx="8" fill="#e8f3f1" stroke="#2f6f73"/>
+<text x="531" y="82" text-anchor="middle" font-weight="600">Dimension index</text><text x="531" y="100" text-anchor="middle" font-size="11.5" fill="#5b6b75">(mean − 1) ÷ 4 × 100</text><text x="531" y="116" text-anchor="middle" font-size="11.5" fill="#5b6b75">15 dimensions</text>
+<rect x="616" y="56" width="120" height="86" rx="8" fill="#e9eff6" stroke="#26496b"/>
+<text x="676" y="82" text-anchor="middle" font-weight="600">Pillar index</text><text x="676" y="100" text-anchor="middle" font-size="11.5" fill="#5b6b75">mean of dimensions</text><text x="676" y="116" text-anchor="middle" font-size="11.5" fill="#5b6b75">→ maturity 1-5</text>
+</g>
+<g fill="none" stroke="#5b6b75" stroke-width="1.25"><path d="M150 99H170" marker-end="url(#b)"/><path d="M298 99H318" marker-end="url(#b)"/><path d="M446 99H466" marker-end="url(#b)"/><path d="M594 99H614" marker-end="url(#b)"/></g>
+<g font-size="11.5">
+<rect x="24" y="196" width="712" height="30" rx="6" fill="#f1f3f4"/>
+<text x="36" y="216" fill="#3d4b53">Severity: Critical &lt;40 · Significant 40-59 · Moderate 60-74 · Healthy ≥75</text>
+<rect x="24" y="158" width="712" height="30" rx="6" fill="#f1f3f4"/>
+<text x="36" y="180" fill="#3d4b53">Perception gap: leaders score a dimension 15+ points above individual contributors</text>
+</g>
+</svg>
