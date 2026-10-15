@@ -23,7 +23,9 @@ def _stats(values: list[float]) -> dict:
 
 def build(scores: list[CampaignScore], responses: pd.DataFrame, inst: Instrument,
           exclude_prefixes: tuple[str, ...] = ("DEMO", "TEST")) -> dict:
-    usable = [s for s in scores if not s.suppressed and not s.campaign.startswith(exclude_prefixes)]
+    # Benchmark = staff baselines only, so every client is compared at the same point and with the same wording.
+    usable = [s for s in scores if not s.suppressed and not s.campaign.startswith(exclude_prefixes)
+              and s.audience == "staff" and s.wave == "T1"]
     dims = {}
     for d in inst.dimensions:
         vals = [x.index_all for s in usable for x in s.dimensions if x.code == d.code and x.index_all is not None]
@@ -34,7 +36,8 @@ def build(scores: list[CampaignScore], responses: pd.DataFrame, inst: Instrument
         pillars[p] = _stats(vals) if vals else None
 
     pooled = clean(responses, inst)
-    pooled = pooled[(pooled["consent_research"] == 1) & ~pooled["campaign"].str.startswith(exclude_prefixes)]
+    pooled = pooled[(pooled["consent_research"] == 1) & ~pooled["campaign"].str.startswith(exclude_prefixes)
+                    & (pooled["audience"] == "staff")]
     return {
         "instrument_version": inst.version,
         "campaigns_included": len(usable),

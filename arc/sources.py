@@ -26,7 +26,7 @@ def from_csv(path: str | Path, inst: Instrument) -> pd.DataFrame:
 
 
 def from_google_sheet(inst: Instrument, sheet_id: str | None = None, creds_json: str | None = None) -> pd.DataFrame:
-    """Read the Responses tab with a Google service account.
+    """Read the Responses tab (and earlier-version Responses tabs) with a Google service account.
 
     Env vars (set as GitHub Actions secrets):
       ARC_SHEET_ID             - the spreadsheet id from its URL
@@ -40,13 +40,25 @@ def from_google_sheet(inst: Instrument, sheet_id: str | None = None, creds_json:
     info = json.loads(creds_json or os.environ["GOOGLE_SERVICE_ACCOUNT"])
     creds = Credentials.from_service_account_info(
         info, scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"])
-    ws = gspread.authorize(creds).open_by_key(sheet_id).worksheet(RESPONSES_TAB)
-    values = ws.get_all_values()
-    if not values:
+    book = gspread.authorize(creds).open_by_key(sheet_id)
+    frames = []
+    for ws in book.worksheets():
+        if not is_responses_tab(ws.title):
+            continue
+        values = ws.get_all_values()
+        if len(values) < 2:
+            continue
+        header, rows = values[0], values[1:]
+        unknown = set(header) - set(inst.columns) - {"instrument_version"}
+        if unknown:
+            raise ValueError(f"Tab '{ws.title}' has columns the instrument does not define: {sorted(unknown)}")
+        frames.append(pd.DataFrame(rows, columns=header).replace("", pd.NA))
+    if not frames:
         return pd.DataFrame(columns=inst.columns)
-    header, rows = values[0], values[1:]
-    df = pd.DataFrame(rows, columns=header).replace("", pd.NA)
-    unknown = set(header) - set(inst.columns) - {"instrument_version"}
-    if unknown:
-        raise ValueError(f"Sheet has columns the instrument does not define: {sorted(unknown)}")
-    return df
+    return pd.concat(frames, ignore_index=True)
+
+
+def is_responses_tab(title: str) -> bool:
+    """The live Responses tab, plus tabs setup() kept from earlier instrument versions."""
+    t = title.strip()
+    return t == RESPONSES_TAB or t.startswith(RESPONSES_TAB + " v") or t.startswith(RESPONSES_TAB + " (earlier")

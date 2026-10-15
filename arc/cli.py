@@ -13,7 +13,7 @@ from pathlib import Path
 
 import yaml
 
-from . import benchmark, report, roi, sources
+from . import benchmark, report, roi, sources, waves
 from .instrument import ROOT, load
 from .scoring import clean, item_means, score_campaign
 
@@ -21,6 +21,19 @@ from .scoring import clean, item_means, score_campaign
 def _campaign_cfg(code: str) -> dict:
     p = ROOT / "campaigns" / f"{code}.yaml"
     return yaml.safe_load(p.read_text()) if p.exists() else {}
+
+
+def _engagement_cfg(code: str, cleaned) -> dict:
+    """engagements/<CODE>.yaml, else the campaign file of the engagement's first T1 staff campaign."""
+    p = ROOT / "engagements" / f"{code}.yaml"
+    if p.exists():
+        return yaml.safe_load(p.read_text()) or {}
+    sub = cleaned[(cleaned["engagement"] == code) & (cleaned["wave"] == "T1") & (cleaned["audience"] == "staff")]
+    for c in sorted(sub["campaign"].unique()):
+        cfg = _campaign_cfg(c)
+        if cfg:
+            return cfg
+    return {}
 
 
 def run(args) -> int:
@@ -62,11 +75,30 @@ def run(args) -> int:
         summary.append(f"| {code} | {s.n} | {'yes' if s.suppressed else 'no'} | "
                        f"{'' if s.overall_index is None else round(s.overall_index)} |")
 
+    eng_summary = []
+    for eng in sorted(cleaned["engagement"].dropna().unique()):
+        if args.campaign:
+            break
+        sub = cleaned[cleaned["engagement"] == eng]
+        if sub[["wave", "audience"]].drop_duplicates().shape[0] < 2:
+            continue  # a single baseline staff campaign: the campaign report covers it
+        cfg = _engagement_cfg(eng, cleaned)
+        ea = waves.analyze(cleaned, inst, eng, cfg.get("roi"))
+        folder = out / f"ENGAGEMENT-{eng}"
+        folder.mkdir(exist_ok=True)
+        report.engagement_to_json(ea, folder / "engagement.json")
+        report.engagement_to_html(ea, cfg.get("client", eng), inst, folder / "engagement.html")
+        latest = next((c for c in reversed(ea.comparisons) if c.audience == "staff" and c.from_wave == "T1"), None)
+        eng_summary.append(f"| {eng} | {', '.join(ea.groups)} | "
+                           + (f"{latest.from_wave}→{latest.to_wave}: {latest.summary['Improved']} improved, "
+                              f"{latest.summary['Declined']} declined" if latest else "-") + " |")
+
     bench = benchmark.build(scores, df, inst)
     bench_path.parent.mkdir(parents=True, exist_ok=True)
     bench_path.write_text(json.dumps(bench, indent=2, default=float))
 
     md = ["| Campaign | Responses | Suppressed | Overall index |", "| --- | --- | --- | --- |", *summary,
+          *(["", "| Engagement | Groups | Change |", "| --- | --- | --- |", *eng_summary] if eng_summary else []),
           "", f"Benchmark: {bench['campaigns_included']} client campaigns, "
           f"{bench['respondents_pooled_with_consent']} consented responses pooled."]
     (out / "SUMMARY.md").write_text("\n".join(md) + "\n")

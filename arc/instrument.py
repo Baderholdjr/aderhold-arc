@@ -13,7 +13,9 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_PATH = ROOT / "instrument" / "items.yaml"
 
-META_COLUMNS = ["response_id", "campaign", "submitted_date", "consent_research", "role"]
+META_COLUMNS = ["response_id", "campaign", "engagement", "wave", "audience", "submitted_date", "consent_research", "role"]
+AUDIENCES = ("staff", "leader")
+WAVES = ("T1", "T2", "T3")
 
 
 @dataclass(frozen=True)
@@ -22,6 +24,7 @@ class Item:
     text: str
     reverse: bool
     dimension: str
+    leader_text: str = ""
 
 
 @dataclass(frozen=True)
@@ -66,9 +69,37 @@ class Instrument:
         return self.raw["instrument"]["version"]
 
     @property
+    def exposure_items(self) -> list[dict]:
+        return (self.raw.get("exposure") or {}).get("items", [])
+
+    @property
+    def change_items(self) -> list[dict]:
+        return (self.raw.get("change") or {}).get("items", [])
+
+    @property
+    def leadership_items(self) -> list[dict]:
+        return (self.raw.get("leadership") or {}).get("items", [])
+
+    @property
+    def extra_ids(self) -> list[str]:
+        """Wave and audience modules: exposure (X.*), perceived change (P*), leadership (L*)."""
+        return ([x["id"] for x in self.exposure_items] + [x["id"] for x in self.change_items]
+                + [x["id"] for x in self.leadership_items])
+
+    @property
+    def change_rules(self) -> dict:
+        return self.raw.get("change_rules") or {"min_points": 5, "alpha": 0.05,
+                                                "exposure_reach_threshold": 0.5, "leader_staff_gap_points": 15}
+
+    def min_group(self, audience: str) -> int:
+        if audience == "leader":
+            return int(self.scoring.get("leader_min_group_size", 3))
+        return int(self.scoring["min_group_size"])
+
+    @property
     def columns(self) -> list[str]:
         """Canonical column order for a response row (Sheet and CSV)."""
-        return META_COLUMNS + self.behavioral_keys + self.item_ids + ["open_text"]
+        return META_COLUMNS + self.behavioral_keys + self.item_ids + self.extra_ids + ["open_text"]
 
     def severity(self, index: float | None) -> str | None:
         if index is None:
@@ -91,7 +122,8 @@ def load(path: str | Path = DEFAULT_PATH) -> Instrument:
     raw = yaml.safe_load(Path(path).read_text())
     dims = []
     for d in raw["dimensions"]:
-        items = tuple(Item(i["id"], i["text"], bool(i["reverse"]), d["code"]) for i in d["items"])
+        items = tuple(Item(i["id"], i["text"], bool(i["reverse"]), d["code"], i.get("leader_text", ""))
+                      for i in d["items"])
         dims.append(Dimension(d["code"], d["name"], d["pillar"], items))
     inst = Instrument(raw=raw, dimensions=dims)
     _validate(inst)

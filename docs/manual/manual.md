@@ -27,7 +27,7 @@ the files, commands, workflows and rules involved. Enough to operate or change i
 marks a place where a screenshot of a Google or GitHub screen belongs. Those screens sit behind your sign-in, so they can't be captured automatically. The list of slots is in the [training guide's appendix](#appendix-screenshots-to-add).
 :::
 
-Every other picture in this manual comes from the demo campaign, **Demo Company (synthetic data)**, campaign code `DEMO-2026Q4`. It is the same 40-response data set as the Excel workbook.
+Every other picture in this manual comes from the demo engagement, **Demo Company (synthetic data)**, engagement code `DEMO`. Its baseline staff campaign, `DEMO-2026Q4`, is the same 40-response data set as the Excel workbook; the midpoint, follow-up and leadership campaigns are synthetic additions that show the three-wave reports.
 
 ## Keeping it current
 
@@ -94,6 +94,8 @@ A 12-minute anonymous survey on a phone or computer. People agree or disagree wi
 
 :::practice
 45 Likert items (3 per dimension, 1 = strongly disagree to 5 = strongly agree), 9 of them reverse-coded. Eight behavioral items: use frequency (B1), depth of use (B2), share of saved time spent re-checking (B3), errors reaching output in 90 days (B4), training hours (B5), own-time learning hours (B6), unapproved tools (B7) and role (B8). One open question. Consent to take part is required; consent to include answers in aggregated research is a separate, optional box.
+
+The survey adapts to the campaign: the **leadership version** rewords the 45 statements about the organization and adds a short leadership section ([§10](#10-the-leadership-survey)); **midpoint and follow-up waves** add a few questions about what changed ([§9](#9-engagements-three-waves)).
 :::
 
 :::tech
@@ -113,12 +115,23 @@ Each client survey wave gets a short code, such as `ACME-2026Q4`. The code goes 
 :::
 
 :::practice
-One campaign = one client wave. Re-measuring a client next quarter is a new campaign (for example `ACME-2027Q1`), which makes trend comparison straightforward. Codes beginning `DEMO` or `TEST` are excluded from the benchmark.
+One campaign = one survey link for one audience in one wave. A typical engagement has four or five: staff and leaders at baseline, staff at the midpoint, and staff and leaders at follow-up. The campaigns are tied together by an **engagement** code (for example `ACME`). Codes beginning `DEMO` or `TEST` are excluded from the benchmark.
 :::
 
 :::tech
-The link format is `<Web app URL>?code=<CODE>`. **Never use `?c=`**: Google reserves the parameters `c` and `sid` for Apps Script itself (see [T-01](#t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code)). Codes are normalized to upper case, letters, digits, `_` and `-`, at most 40 characters. A campaign is active when its row in the Sheet's **Campaigns** tab has `active` set to a ticked checkbox, `TRUE`, `Yes`, `Y`, `1` or `Open`. ROI inputs live in the repo at `campaigns/<CODE>.yaml`.
+The link format is `<Web app URL>?code=<CODE>`. **Never use `?c=`**: Google reserves the parameters `c` and `sid` for Apps Script itself (see [T-01](#t-01-sorry-unable-to-open-the-file-on-every-link-with-a-code)). Codes are normalized to upper case, letters, digits, `_` and `-`, at most 40 characters. A campaign is active when its row in the Sheet's **Campaigns** tab has `active` set to a ticked checkbox, `TRUE`, `Yes`, `Y`, `1` or `Open`. ROI inputs live in the repo at `campaigns/<CODE>.yaml` (one campaign) or `engagements/<ENGAGEMENT>.yaml` (the whole engagement).
 :::
+
+| Campaigns column | What to enter | If left blank |
+| --- | --- | --- |
+| `code` | The link code, for example `ACME-T1-STAFF` | Required |
+| `display_name` | Client name shown on the survey header | No header line |
+| `active` | `TRUE` / ticked while the link should accept answers | Closed |
+| `notes` | Anything for you | |
+| `engagement` | The engagement this campaign belongs to, for example `ACME` | The campaign code itself |
+| `wave` | `T1` baseline, `T2` midpoint or `T3` follow-up | `T1` |
+| `audience` | `staff` or `leader` | `staff` |
+| `modules` | For T2/T3: the recommendations implemented, for example `M3, M6, M7` | No exposure questions |
 
 ![What a respondent sees on a closed or mistyped link](images/survey-closed.png)
 
@@ -139,7 +152,7 @@ Anonymity is designed in, not promised: no names, emails, IP addresses, device d
 :::
 
 :::tech
-The **Responses** tab holds one row per response with the columns in `ARC_INSTRUMENT.columns` (metadata, behavioral keys, 45 item ids, `open_text`, `instrument_version`). `setup()` creates the tabs and refuses to rewrite a Responses tab that already holds data with different columns. Writes use a script lock so simultaneous submissions don't collide. Data handling rules are in `docs/DATA_PROTECTION.md`.
+The **Responses** tab holds one row per response with the columns in `ARC_INSTRUMENT.columns` (metadata, behavioral keys, 45 item ids, `open_text`, `instrument_version`). `setup()` creates the tabs. If the Responses tab already holds data under a different instrument version, it renames that tab (for example `Responses v1.0.0`) and starts a fresh one, so old data is never overwritten. It also adds any missing Campaigns columns and test campaigns, and is safe to re-run. The nightly run reads the live Responses tab and every earlier-version tab (`Responses v…`). Writes use a script lock so simultaneous submissions don't collide. Data handling rules are in `docs/DATA_PROTECTION.md`.
 :::
 
 :::shot
@@ -157,7 +170,7 @@ Severity bands: **Critical** < 40, **Significant** 40–59, **Moderate** 60–74
 :::
 
 :::tech
-`arc/scoring.py`. Reverse-coded items are flipped (6 − answer). Item means are taken per group (all, IC, leaders = MGR + SL); dimension index = (mean of item means − 1) ÷ 4 × 100; pillar index = mean of dimensions; overall = mean of pillars. Cleaning keeps a response only if it answers at least half the items, blanks values outside 1–5, and drops duplicate `response_id`s. Groups below `min_group_size` (5) return no score. The engine reproduces the Excel workbook's values exactly; `tests/test_engine.py` checks this on every push.
+`arc/scoring.py`. Reverse-coded items are flipped (6 − answer). Item means are taken per group (all, IC, leaders = MGR + SL); dimension index = (mean of item means − 1) ÷ 4 × 100; pillar index = mean of dimensions; overall = mean of pillars. Cleaning keeps a response only if it answers at least half the items, blanks values outside 1–5, and drops duplicate `response_id`s. Groups below `min_group_size` (5 for staff, 3 for leaders) return no score. The engine reproduces the Excel workbook's values exactly; `tests/test_engine.py` checks this on every push.
 :::
 
 ![How answers become scores](images/scoring-flow.svg){.wide}
@@ -205,7 +218,98 @@ The HTML report is the readout backbone: pillar maturity, overall index, top gap
 
 ![The value leakage section](images/report-leakage.png)
 
-## 9. The nightly run
+## 9. Engagements: three waves
+
+:::plain
+A diagnostic tells a client where the gaps are. An engagement proves whether fixing them worked. The survey runs three times: a **baseline** before anything changes, a **midpoint** once your recommendations are in place, so you can adjust course, and a **follow-up** at the end to show whether things got better or worse.
+:::
+
+:::practice
+| Wave | When | Who | What it adds | What it answers |
+| --- | --- | --- | --- | --- |
+| **T1 Baseline** | Before the work starts | Staff and leaders | The core survey | Where are the gaps, and what are they worth? |
+| **T2 Midpoint** | 6–10 weeks after recommendations go live | Staff (leaders optional) | Exposure check: did each recommendation reach you? | Is each recommendation reaching people, and moving its targets? What should we adjust? |
+| **T3 Follow-up** | 3–6 months after T1 | Staff and leaders | Exposure check plus five "looking back" questions | Did the program lead to positive or negative change, and how much value was recovered? |
+
+Waves are compared at group level only. Nobody is tracked from one wave to the next, so anonymity holds and people answer as freely at T3 as at T1. The trade-off is that you see change in the group, not in individuals; with groups of 30+ that is enough to detect meaningful change.
+
+A dimension counts as **Improved** or **Declined** only when it moves at least 5 index points *and* the change is statistically reliable (Welch's t-test, p < 0.05). Anything smaller is reported as **No reliable change**, which protects you from over-claiming in a readout.
+
+The **exposure check** asks one yes/no/not sure question per implemented recommendation (for example *"I received role-specific AI training during work time"* for M3). Each recommendation gets a status:
+
+| Status | Meaning | What to do |
+| --- | --- | --- |
+| **Not reaching people** | Under 50% say it reached them | Delivery problem: relaunch, communicate, check managers |
+| **Working** | Reaching people, and at least one target dimension improved | Keep going |
+| **Reaching people, not yet moving** | Reaching people, targets haven't moved reliably | Give it time, or redesign |
+| **Reaching people, moving the wrong way** | A target declined | Investigate now |
+
+The report also compares, within the wave, people a recommendation reached with people it didn't. A positive gap supports (but doesn't prove) that the recommendation is doing its job.
+
+At T3, five **looking back** questions ask people directly how usefulness, trust judgment, team workflow, psychological safety and workload changed since the program started (much worse to much better). They complement the measured change: if both agree, the story is strong.
+:::
+
+:::tech
+Each campaign row carries `engagement`, `wave`, `audience` and `modules`. Exposure items `X.M1`–`X.M12` are shown only at T2/T3 and only for modules listed in the campaign; they are stored as 1 (yes), 0 (no) or blank (not sure). The change items `P1`–`P5` (−2 to +2) are shown only at T3. Rules live in `instrument/items.yaml` under `change_rules:` (`min_points: 5`, `alpha: 0.05`, `exposure_reach_threshold: 0.5`, `leader_staff_gap_points: 15`) and the analysis in `arc/waves.py`. Each module's target dimensions are listed under `exposure:` in the same file.
+:::
+
+![Answering the exposure check at the midpoint](images/survey-exposure.png)
+
+![The "looking back" questions at follow-up](images/survey-change.png)
+
+## 10. The leadership survey
+
+:::plain
+Leaders get their own version of the survey. It covers the same topics, worded from a leader's point of view (for example *"Our people would say leadership has clearly explained why we are adopting AI"* instead of *"Leadership has clearly explained why our organization is adopting AI"*), plus a few questions only leaders are asked about strategy, funding and expectations. Putting the two side by side shows where leaders think something is solved and staff disagree.
+:::
+
+:::practice
+Same 45 statements, reworded about the organization, and the same behavioral questions (role is recorded as *Leader*). The leadership section adds six statements (written AI strategy with measurable goals; knowing the expected return; willingness to change blame policy for AI errors; willingness to protect the right to override AI; training funding; leaders modeling good AI use) and an expected payback question. The open question asks what worries them most about AI.
+
+The **leader-vs-staff gap** is leader index minus staff index per dimension. A gap of +15 or more is flagged *Leaders see it better*; −15 or less *Leaders see it worse*. This is a stronger version of the perception gap in the staff survey, which compares managers inside the staff sample with individual contributors.
+
+Leadership groups are small, so leader results are shown at **3 or more** responses (staff stay at 5). Tell leaders this in the invitation, and review leader comments with particular care before quoting any.
+:::
+
+:::tech
+A campaign with `audience` = `leader` serves the leader wording (`leader_text` in `items.yaml`) and the `leadership:` items `L1`–`L7`. `scoring.leader_min_group_size: 3`. Leader campaigns are never included in the cross-client benchmark or the validation statistics, because the wording differs.
+:::
+
+## 11. The progress report
+
+:::plain
+As soon as an engagement has more than one survey (for example staff and leaders at baseline, or a baseline and a midpoint), the tool produces a **progress report** alongside the usual campaign reports. It shows, on one page, what changed, whether each recommendation is working, how leaders and staff compare, and how much value was recovered.
+:::
+
+:::practice
+Sections, in order:
+
+1. **Who answered**: responses by wave and audience
+2. **Maturity by pillar, wave by wave**, with the change since baseline
+3. **Change by dimension**, baseline to latest wave, with the status for each dimension (and a column for the change since the midpoint)
+4. **Midpoint / follow-up check**: one row per implemented recommendation, with reach, target movement, exposed-vs-not difference and status
+5. **Leaders vs. staff** for each wave where both groups are reportable
+6. **What staff say changed** (T3)
+7. **Value recovered**: realized annual value at each wave against baseline, using survey factors only, so the waves are comparable
+
+Use the midpoint report to adjust: relaunch anything *Not reaching people*, and rethink anything *Reaching people, not yet moving*. Use the follow-up report for the close-out readout and the case study.
+:::
+
+:::tech
+`python -m arc run` writes `reports/ENGAGEMENT-<ENGAGEMENT>/engagement.html` and `engagement.json` for every engagement with two or more wave/audience groups; `reports/SUMMARY.md` gains an engagement table. ROI inputs come from `engagements/<ENGAGEMENT>.yaml` (start from `engagements/_TEMPLATE.yaml`), or, if that file doesn't exist, from the campaign file of the engagement's baseline staff campaign. Value recovered ignores `overrides:` so each wave is measured the same way. Single campaigns still get their own report; a leader campaign's report shows only a Leaders column.
+:::
+
+![Top of the demo progress report](images/eng-top.png)
+
+![Change by dimension, baseline to follow-up](images/eng-change.png)
+
+![The midpoint check: M7 isn't reaching people yet](images/eng-exposure.png)
+
+![Leaders vs. staff at baseline](images/eng-leaders.png)
+
+![Value recovered by wave](images/eng-value.png)
+
+## 12. The nightly run
 
 :::plain
 Every night GitHub reads the Sheet, scores every campaign, and makes fresh reports. You can also run it any time with one button.
@@ -223,21 +327,21 @@ Turnaround is next morning by default, or minutes on demand during a readout wee
 **Actions → Nightly scoring** run summary listing the campaigns.
 :::
 
-## 10. Benchmark across clients
+## 13. Benchmark across clients
 
 :::plain
 As you run more clients, the tool builds a comparison: where a client sits against others on each gap. It uses only group-level scores, never individual answers.
 :::
 
 :::practice
-Each non-suppressed client campaign contributes its dimension and pillar indexes. The benchmark reports count, mean, quartiles and median. Reports show a client's position (bottom quartile to top quartile) once five or more client campaigns exist. Over time this database is your strongest competitive asset.
+Each non-suppressed client **staff baseline (T1)** campaign contributes its dimension and pillar indexes, so every client is compared at the same point with the same wording. The benchmark reports count, mean, quartiles and median. Reports show a client's position (bottom quartile to top quartile) once five or more client campaigns exist. Over time this database is your strongest competitive asset.
 :::
 
 :::tech
 `arc/benchmark.py` writes `benchmark/summary.json`. Campaigns starting `DEMO` or `TEST` are excluded. The nightly run commits the file to the repo, and a copy goes in each reports artifact.
 :::
 
-## 11. Validation statistics
+## 14. Validation statistics
 
 :::plain
 To call the survey "validated", you need statistics showing it measures what it claims. The tool calculates these automatically as consented responses build up, so validation happens as a by-product of client work.
@@ -248,24 +352,24 @@ Cronbach's alpha per dimension (target ≥ 0.70) with corrected item-total corre
 :::
 
 :::tech
-`arc/psychometrics.py`, numpy only. Only respondents who ticked the research box (`consent_research = 1`) are pooled, and `DEMO` and `TEST` campaigns are excluded. Results are written into `benchmark/summary.json` under `reliability` and `structure`.
+`arc/psychometrics.py`, numpy only. Only staff respondents who ticked the research box (`consent_research = 1`) are pooled, and `DEMO` and `TEST` campaigns are excluded. Results are written into `benchmark/summary.json` under `reliability` and `structure`.
 :::
 
-## 12. The Excel workbook
+## 15. The Excel workbook
 
 :::plain
 An offline Excel version of the scoring and ROI model, for workshops and for clients who send you their own survey export.
 :::
 
 :::practice
-Same scoring rules and ROI formulas as the engine, with blue input cells and yellow assumptions. Useful for live ROI conversations: change an input and the value leakage updates on the spot.
+Same scoring rules and ROI formulas as the engine, with blue input cells and yellow assumptions. It covers a single staff baseline; wave comparisons and the leadership survey are in the engine's reports only. Useful for live ROI conversations: change an input and the value leakage updates on the spot.
 :::
 
 :::tech
 `ARC_Diagnostic_and_ROI_Workbook.xlsx` (delivered separately). Paste responses into the **Responses** tab in the column order shown there. The engine and workbook produce identical results on the demo data.
 :::
 
-## 13. Data protection
+## 16. Data protection
 
 :::plain
 Clients' people answer honestly only if they trust the anonymity. The tool collects nothing that identifies anyone, hides small groups, and never puts individual answers in GitHub.
@@ -279,25 +383,26 @@ Contracts should cover purpose limitation, the anonymity rules, retention (raw r
 See `docs/DATA_PROTECTION.md`. `.gitignore` blocks `reports/`, data files other than `data/demo/`, `.env` files and credential JSON. The service account has Viewer access to one Sheet and read-only Sheets scope.
 :::
 
-## 14. Changing the instrument
+## 17. Changing the instrument
 
 :::plain
 You can change the survey's wording or add questions, but changes must be deliberate, versioned, and kept comparable with past results.
 :::
 
 :::practice
-Don't change item ids or meanings once responses exist, or benchmarks stop being comparable. Any change bumps the instrument version and starts a new Responses tab.
+Don't change item ids or meanings once responses exist, or benchmarks stop being comparable. Any change bumps the instrument version and starts a new Responses tab. Avoid changing the instrument in the middle of an engagement: T1 and T3 must use the same statements to be comparable.
 :::
 
 :::tech
-Edit `instrument/items.yaml`, bump `instrument.version`, run `python -m arc build-collector`, run the tests, and commit. Then rename the Sheet's Responses tab (for example `Responses v1.0.0`), paste the new `Items.gs` into Apps Script, run `setup()`, and deploy a new version. See [Module 9](#module-9-update-the-survey).
+Edit `instrument/items.yaml`, bump `instrument.version`, run `python -m arc build-collector`, run the tests, and commit. Then paste the new `Items.gs` (and any changed `Code.gs` or `Survey.html`) into Apps Script, run `setup()`, which moves the old responses to a tab named after their version, and deploy a new version. See [Module 9](#module-9-update-the-survey).
 :::
 
-## 15. Boundaries: what the tool will and won't do
+## 18. Boundaries: what the tool will and won't do
 
 | The tool will | The tool won't |
 | --- | --- |
 | Measure people-side gaps and estimate the value at stake | Prove causation or guarantee ROI |
+| Show whether gaps closed between waves, and which recommendations reached people | Track any individual between waves |
 | Flag where leaders and staff see things differently | Identify individuals, or let you |
 | Build reports and a benchmark automatically | Decide the intervention: that's your judgment |
 | Accumulate validation statistics | Claim the instrument is validated before the evidence exists |
@@ -315,20 +420,22 @@ Run from the repository folder (`pip install -r requirements-dev.txt` first).
 | `python -m arc run … --out reports --benchmark benchmark/summary.json` | Choose output folder and benchmark file |
 | `python -m arc build-collector` | Regenerate `collector/Items.gs` from `instrument/items.yaml` |
 | `python -m pytest -q` | Run the tests |
+| `node tests/collector.test.js` | Test the Apps Script logic against a fake Sheet |
+| `python tools/make_demo.py` | Regenerate the synthetic demo engagement |
 
 **Apps Script functions** (choose in the function menu, then **Run**):
 
 | Function | What it does |
 | --- | --- |
-| `setup` | Create the Responses and Campaigns tabs and header row; safe to re-run |
-| `checkSetup` | Log tabs, campaign codes, active status and deployment notes |
+| `setup` | Create or upgrade the Responses and Campaigns tabs, keep old-version responses in a renamed tab, add the test campaigns; safe to re-run |
+| `checkSetup` | Log tabs, each campaign's code, active status, engagement, wave, audience and modules, and deployment notes |
 
 ## Appendix B: Workflows
 
 | Workflow | File | When it runs | What it does |
 | --- | --- | --- | --- |
-| CI | `ci.yml` | Every push and pull request | Tests, checks `Items.gs` is in sync, runs the demo end to end |
-| Nightly scoring | `nightly.yml` | Daily 03:17 Pacific, or **Run workflow** | Reads the Sheet, scores, uploads reports, commits the benchmark |
+| CI | `ci.yml` | Every push and pull request | Tests (engine and Apps Script), checks `Items.gs` is in sync, runs the demo end to end |
+| Nightly scoring | `nightly.yml` | Daily 03:17 Pacific, or **Run workflow** | Reads the Sheet, scores campaigns and engagements, uploads reports, commits the benchmark |
 
 ## Appendix C: Scoring reference
 
@@ -340,7 +447,10 @@ Run from the repository folder (`pip install -r requirements-dev.txt` first).
 | Severity | Critical < 40 · Significant 40–59 · Moderate 60–74 · Healthy ≥ 75 |
 | Maturity | 1 Imposed · 2 Tolerated · 3 Adopted · 4 Calibrated · 5 Integrated (bands of 20) |
 | Perception gap | Leaders − IC ≥ 15 points |
-| Minimum group size | 5 |
+| Minimum group size | 5 staff · 3 leaders |
+| Improved / Declined | ±5 index points or more **and** p < 0.05 (Welch's t-test) |
+| Leader-vs-staff flag | Leader − staff ≥ 15 or ≤ −15 points |
+| Recommendation not reaching people | Under 50% answer yes |
 | Response counted | At least 23 of 45 items answered |
 | Alpha target / item-total flag | ≥ 0.70 / < 0.30 |
 | EFA threshold | 200 complete consented responses |
@@ -349,7 +459,13 @@ Run from the repository folder (`pip install -r requirements-dev.txt` first).
 
 | Term | Meaning |
 | --- | --- |
-| Campaign / wave | One client survey round, identified by a code such as `ACME-2026Q4` |
+| Campaign | One survey link for one audience in one wave, identified by a code such as `ACME-T1-STAFF` |
+| Engagement | One client program, grouping its campaigns across waves and audiences |
+| Wave | T1 Baseline, T2 Midpoint or T3 Follow-up |
+| Audience | Staff or leader; leaders get the leadership version of the survey |
+| Exposure check | T2/T3 questions asking whether each implemented recommendation reached the respondent |
+| Leader-vs-staff gap | Leader index minus staff index for a dimension |
+| No reliable change | A move under 5 points, or one that isn't statistically reliable |
 | Dimension | One of the 15 measured gaps (A1–F3) |
 | Pillar | Acceptance, Reliance, Collaboration, or the Foundation |
 | Index | A 0–100 score for a dimension or pillar |
@@ -388,7 +504,7 @@ You don't need a terminal. Every step can be done from Google and the GitHub web
 5. [Set the ROI inputs with the client](#module-5-set-the-roi-inputs-with-the-client)
 6. [Read a client report](#module-6-read-a-client-report)
 7. [Deliver the readout](#module-7-deliver-the-readout)
-8. [Close the wave and re-measure](#module-8-close-the-wave-and-re-measure)
+8. [Run the midpoint and follow-up](#module-8-run-the-midpoint-and-follow-up)
 9. [Update the survey](#module-9-update-the-survey)
 10. [Your weekly routine](#module-10-your-weekly-routine)
 
@@ -432,7 +548,7 @@ you create one spreadsheet and attach the survey code to it. Google then gives y
 
 **Check it worked:**
 
-- The Sheet now has **Responses** and **Campaigns** tabs, with `TEST-0001` active in Campaigns.
+- The Sheet now has **Responses** and **Campaigns** tabs. Campaigns lists four active test campaigns: `TEST-0001` (staff baseline), `TEST-LEAD` (leadership), `TEST-T2` (midpoint) and `TEST-T3` (follow-up).
 - In a private/incognito window, `<Web app URL>?code=TEST-0001` shows the welcome screen.
 
 ## Module 2: Connect GitHub to the Sheet
@@ -468,22 +584,35 @@ you create a robot Google account that can only look at this one Sheet, and give
 2. **Give TEST-0001 ROI inputs** (optional). In GitHub, copy `campaigns/_TEMPLATE.yaml` to `campaigns/TEST-0001.yaml` (**Add file → Create new file**, paste, edit `client:`) and commit.
 3. **Run the workflow.** **Actions → Nightly scoring → Run workflow**, optionally entering `TEST-0001` as the campaign.
 4. **Download the report.** Open the run, scroll to **Artifacts**, and download `arc-reports-…`. Open `TEST-0001/report.html`.
+5. **Try the other survey versions.** Open each link once and check what's different:
+    - `?code=TEST-LEAD`: the leadership version. No role question, statements are about the organization, and there's a *Your leadership view* page.
+    - `?code=TEST-T2`: the midpoint. A *What has changed for you* page asks about M3, M6 and M7.
+    - `?code=TEST-T3`: the follow-up. The same page plus *Looking back*.
+
+6. **See a progress report** (optional). Submit 3+ responses on `TEST-LEAD` and 5+ on `TEST-T3`, then re-run the workflow. The artifact now has `ENGAGEMENT-TEST/engagement.html`.
 
 **Check it worked:** the report shows pillar maturity, top gaps and all 15 dimensions with IC and leaders columns filled. With fewer than 5 responses it says *suppressed*, which is correct.
 
 ## Module 4: Launch a client wave
 
-**Goal:** a live, client-specific survey link.
+**Goal:** live baseline (T1) links for the client's staff and leaders.
 
-1. **Pick a code:** client short name plus period, for example `ACME-2026Q4`.
-2. **Activate it.** In the Sheet's **Campaigns** tab add a row: `code` `ACME-2026Q4`, `display_name` `Acme` (shown on the survey header), `active` `TRUE`.
-3. **Create the campaign file.** In GitHub, create `campaigns/ACME-2026Q4.yaml` from `_TEMPLATE.yaml` with the client name and survey dates. ROI inputs can wait for Module 5.
-4. **Test the link** in a private window: `<Web app URL>?code=ACME-2026Q4`. The header shows *For Acme*.
+1. **Pick an engagement code and campaign codes:** the client's short name for the engagement (`ACME`), and one campaign per audience and wave, for example `ACME-T1-STAFF` and `ACME-T1-LEAD`.
+2. **Activate them.** In the Sheet's **Campaigns** tab add a row for each:
+
+    | code | display_name | active | notes | engagement | wave | audience | modules |
+    | --- | --- | --- | --- | --- | --- | --- | --- |
+    | `ACME-T1-STAFF` | Acme | TRUE | | ACME | T1 | staff | |
+    | `ACME-T1-LEAD` | Acme | TRUE | | ACME | T1 | leader | |
+
+3. **Create the engagement file.** In GitHub, copy `engagements/_TEMPLATE.yaml` to `engagements/ACME.yaml` and fill in the client name and wave dates. ROI inputs can wait for Module 5.
+4. **Test both links** in a private window: `<Web app URL>?code=ACME-T1-STAFF` and `?code=ACME-T1-LEAD`. The header shows *For Acme*; the leader link opens on *Leadership view*.
 5. **Send it through the sponsor.** The client's executive sponsor sends the link, not you. Suggested message:
 
     > We're running a short, anonymous survey (about 12 minutes) on how AI tools are working for you and your team. There are no right answers. Nobody, including the consultant, can see who said what, and results are only reported for groups of 5 or more. Please complete it by [date]: [link]
 
-6. **Plan for response rate.** Aim for 60%+ of AI-affected staff, with a reminder from the sponsor at the halfway point.
+6. **Send the leader link separately**, to directors and above (or whoever owns AI decisions). Tell them their results are reported only as a group of 3 or more, and ask them not to put identifying details in comments.
+7. **Plan for response rate.** Aim for 60%+ of AI-affected staff, with a reminder from the sponsor at the halfway point.
 
 ## Module 5: Set the ROI inputs with the client
 
@@ -491,11 +620,11 @@ you create a robot Google account that can only look at this one Sheet, and give
 
 1. **Gather the client numbers:** licensed users, loaded hourly cost, AI tool cost, expected hours saved per week (from their pilot or vendor), material AI errors per year and their typical cost, voluntary turnover and average salary.
 2. **Agree the assumptions** out loud: healthy verification share (default 20%), the AI-attributable share of turnover (default 10%), targets and the confidence haircut (default 50%).
-3. **Edit `campaigns/<CODE>.yaml`** under `roi:`. Leave the four `overrides:` as `~` so the survey supplies adoption, depth, verification and capture; override only with better data, such as license telemetry for adoption.
+3. **Edit `engagements/<ENGAGEMENT>.yaml`** (or `campaigns/<CODE>.yaml` for a one-off diagnostic) under `roi:`. Leave the four `overrides:` as `~` so the survey supplies adoption, depth, verification and capture; override only with better data, such as license telemetry for adoption.
 4. **Re-run** the workflow for that campaign.
 
 :::practice
-use the client's own numbers wherever they exist. A defensible conservative estimate beats a large one; the re-measure in Module 8 is what proves value.
+use the client's own numbers wherever they exist. A defensible conservative estimate beats a large one; the follow-up in Module 8 is what proves value.
 :::
 
 ## Module 6: Read a client report
@@ -507,6 +636,7 @@ use the client's own numbers wherever they exist. A defensible conservative esti
 3. **Scan the Flag column.** Every *Perception gap* is a conversation: leaders believe something is solved that staff say isn't. These land hard in readouts; present them as a shared blind spot, not blame.
 4. **Check the behavioral signals.** Under 5 training hours and high own-time learning together confirm an onboarding deficit (A3). High re-checking with low R4 points to a trust collapse after errors.
 5. **Read the value waterfall.** The biggest red bar is where the money is. Early rollouts lose most at adoption and depth; mature ones at re-checking and capture.
+6. **Open the leadership report** (`ACME-T1-LEAD/report.html`) and, once both exist, the progress report (`ENGAGEMENT-ACME/engagement.html`). Its *Leaders vs. staff* table is the sharpest evidence in the readout: a +15 *Leaders see it better* on F1 (blame) or A3 (onboarding) is a common, important finding.
 
 ![Reading the dimension table](images/report-dimensions.png)
 
@@ -514,25 +644,51 @@ use the client's own numbers wherever they exist. A defensible conservative esti
 
 **Goal:** a decision on next steps.
 
-1. **Structure (45–60 minutes):** the headline (pillar maturity and value at stake) · top gaps with the evidence · perception gaps · recommended interventions · 90-day roadmap · decision.
+1. **Structure (45–60 minutes):** the headline (pillar maturity and value at stake) · top gaps with the evidence · leader-vs-staff and perception gaps · recommended interventions · 90-day roadmap with the midpoint and follow-up dates · decision.
 2. **Map gaps to interventions** using the playbook's catalog. For example: A3 → M3 Role-Based Onboarding; R3/R4 → M6 Proportionate Verification and M7 the flop protocol; F1/F2 → M11 Governance for Leaders; C2 → M8 the AI Direction Ladder.
 3. **Quote the risk-adjusted value** and the engagement fee side by side.
-4. **Share the report** as the HTML file or the Excel scorecard. Never share the Sheet or comments that could identify anyone.
+4. **Agree the measurement plan:** which recommendations (modules) will be implemented, when they go live, and the T2 and T3 dates. The modules you agree here go in the `modules` column at T2 and T3.
+5. **Share the report** as the HTML file or the Excel scorecard. Never share the Sheet or comments that could identify anyone.
 
-## Module 8: Close the wave and re-measure
+## Module 8: Run the midpoint and follow-up
 
-**Goal:** proof that the work moved the numbers.
+**Goal:** adjust the program while it runs, then prove whether it worked.
 
-1. **Close the wave:** set `active` to `FALSE` in the Campaigns tab. The link then shows "currently closed".
-2. **Keep the final report:** download the artifact and file it with the client's engagement records; artifacts expire after 30 days.
-3. **Re-measure 3–6 months later** with a new code (`ACME-2027Q1`) and the same population. Compare indexes, and put the realized-value change into the case study.
+:::plain
+the midpoint asks "is it working, and what should we change?" The follow-up asks "did it work?" Both use the same survey as the baseline, plus a few questions about what changed.
+:::
+
+1. **Close the baseline:** set `active` to `FALSE` on the T1 rows. The links then show "currently closed". Download and file the baseline reports; artifacts expire after 30 days.
+2. **Midpoint (T2), 6–10 weeks after the recommendations go live.** Add a row, listing the modules actually implemented:
+
+    | code | display_name | active | engagement | wave | audience | modules |
+    | --- | --- | --- | --- | --- | --- | --- |
+    | `ACME-T2-STAFF` | Acme | TRUE | ACME | T2 | staff | M3, M6, M7, M11 |
+
+    A leader midpoint is optional; add `ACME-T2-LEAD` the same way if leaders' views are moving fast.
+
+3. **Read the midpoint check** in the progress report. For each recommendation: *Not reaching people* means fix delivery (relaunch, manager briefings, schedule time); *Reaching people, not yet moving* means give it time or redesign it. Agree the adjustments with the sponsor and note them in the engagement file.
+4. **Follow-up (T3), 3–6 months after T1.** Add `ACME-T3-STAFF` and `ACME-T3-LEAD` with wave `T3` and the same modules (plus any added after the midpoint). Use the same population as the baseline.
+5. **Read the change by dimension.** Report *Improved* and *Declined* as they are, and *No reliable change* as "no measurable change yet". A decline is a finding, not a failure: name it and propose a fix.
+6. **Close out:** set every row to `FALSE`, download the final progress report, and put the value recovered and the dimension changes into the case study.
+
+**Check it worked:** the progress report shows a *Change by dimension* table for T1 to T3 and a check table for each wave with modules.
 
 ## Module 9: Update the survey
 
 **Goal:** a change to the Apps Script code or the questions, live without breaking anything.
 
 1. **Code-only change** (for example a fix to `Code.gs` or `Survey.html`): paste the new file into Apps Script, **Save**, then **Deploy → Manage deployments → pencil → Version: New version → Deploy**. The URL stays the same.
-2. **Question change:** follow [Product guide §14](#14-changing-the-instrument). In short: edit `items.yaml`, bump the version, `build-collector`, rename the old Responses tab, paste the new `Items.gs`, run `setup`, and deploy a new version.
+2. **Question change:** follow [Product guide §17](#17-changing-the-instrument). In short: edit `items.yaml`, bump the version, `build-collector`, paste the new `Items.gs`, run `setup` (it moves old responses to their own tab), and deploy a new version.
+
+**Upgrading from v1.0 to v1.1 (three waves and the leadership survey):**
+
+1. In Apps Script, replace the contents of `Code.gs`, `Items` and `Survey` with the current files from the repository's `collector/` folder. **Save.**
+2. Run **setup**. It renames the existing Responses tab to `Responses v1.0.0`, creates a new Responses tab, adds the `engagement`, `wave`, `audience` and `modules` columns to Campaigns, and adds the three new test campaigns. Existing campaign rows keep working: blank columns mean a staff baseline.
+3. **Deploy → Manage deployments → pencil → Version: New version → Deploy.** The URL stays the same.
+4. Test `?code=TEST-LEAD`, `?code=TEST-T2` and `?code=TEST-T3` in a private window.
+
+The nightly run reads the new Responses tab and any earlier-version tabs, so responses collected under v1.0 are still scored, as staff baseline responses.
 
 **Check it worked:** open a test link in a private window and confirm the change.
 
@@ -560,6 +716,7 @@ These screens sit behind a Google or GitHub sign-in. Capture each one from your 
 | 4 | **Actions → Nightly scoring** run summary | `gh-nightly.png` |
 | 5 | The run's **Artifacts** section | `gh-artifacts.png` |
 | 6 | Apps Script **Execution log** after `checkSetup` | `g-checksetup.png` |
+| 7 | The Sheet's **Campaigns** tab with the eight columns and the test campaigns | `g-campaigns.png` |
 
 <!-- part:3 Troubleshooting guide -->
 Find your symptom in the index, then follow the entry. Each entry gives:
@@ -589,11 +746,11 @@ Entries marked **(seen in the pilot)** happened while setting up the system in O
 | "No HTML file named Survey was found" | [T-06](#t-06-no-html-file-named-survey) |
 | Changes to the survey don't appear | [T-07](#t-07-changes-dont-appear) |
 | "Google hasn't verified this app" | [T-08](#t-08-google-hasnt-verified-this-app) |
-| `setup` says the Responses tab has different columns | [T-09](#t-09-setup-refuses-different-columns) |
+| A new tab `Responses v1.0.0` appeared after `setup` | [T-09](#t-09-setup-renamed-the-responses-tab) |
 | Respondent sees "Please answer at least half…" or "Please select your role" | [T-10](#t-10-a-respondent-cant-submit) |
 | Nightly run says secrets are not set | [T-11](#t-11-secrets-not-set) |
 | Nightly run fails reading the Sheet | [T-12](#t-12-the-run-cant-read-the-sheet) |
-| "Sheet has columns the instrument does not define" | [T-13](#t-13-unknown-sheet-columns) |
+| "Tab … has columns the instrument does not define" | [T-13](#t-13-unknown-sheet-columns) |
 | Nightly run fails at "Commit refreshed benchmark" | [T-14](#t-14-the-benchmark-commit-fails) |
 | "Node.js 20 is deprecated" warning | [T-15](#t-15-nodejs-20-deprecated) |
 | Report says *suppressed* or shows *n<5* | [T-16](#t-16-suppressed-or-n5) |
@@ -601,6 +758,11 @@ Entries marked **(seen in the pilot)** happened while setting up the system in O
 | CI fails: "collector/Items.gs is out of date" | [T-18](#t-18-itemsgs-out-of-date) |
 | A campaign is missing from the run summary | [T-19](#t-19-a-campaign-is-missing) |
 | Artifacts are gone | [T-20](#t-20-artifacts-expired) |
+| Leader results show *n<3* or *suppressed* | [T-21](#t-21-leader-results-suppressed) |
+| The midpoint or follow-up survey has no *What has changed* page | [T-22](#t-22-no-exposure-questions) |
+| No progress report, or a wave is missing from it | [T-23](#t-23-no-progress-report) |
+| Scores went up, but the report says *No reliable change* | [T-24](#t-24-no-reliable-change) |
+| A leader link shows the staff survey (or the reverse) | [T-25](#t-25-wrong-survey-version) |
 
 ---
 
@@ -674,13 +836,13 @@ Run `checkSetup` to see exactly what the script sees.
 
 **Fix:** **Advanced → Go to (project name) (unsafe) → Allow**. The script asks only for access to this one spreadsheet.
 
-### T-09: setup refuses: different columns
+### T-09: setup renamed the Responses tab
 
-**What you see:** *Responses tab already has data with different columns.*
+**What you see:** after running `setup`, a tab such as `Responses v1.0.0` holds your earlier answers and a new, empty **Responses** tab has appeared. The log says *Previous responses kept in tab …*
 
-**Why:** the instrument changed while old responses exist. Mixing versions would corrupt scoring.
+**Why:** the instrument version changed (for example the v1.1 upgrade). Mixing column layouts in one tab would corrupt scoring, so `setup` keeps the old rows in their own tab.
 
-**Fix:** rename the existing tab (for example `Responses v1.0.0`) and run `setup` again.
+**Fix:** none needed. Don't rename or delete the old tab: the nightly run reads it too. Make sure you deployed a new version afterwards ([T-07](#t-07-changes-dont-appear)).
 
 ### T-10: A respondent can't submit
 
@@ -713,9 +875,9 @@ Run `checkSetup` to see exactly what the script sees.
 
 ### T-13: Unknown Sheet columns
 
-**What you see:** *Sheet has columns the instrument does not define.*
+**What you see:** *Tab '…' has columns the instrument does not define.*
 
-**Why:** someone added or renamed a column in the Responses tab, or the Sheet is on a newer instrument than the repo.
+**Why:** someone added or renamed a column in a Responses tab, or the Sheet is on a newer instrument than the repo. Another tab whose name starts `Responses v` is also read, so don't use that name for anything else.
 
 **Fix:** undo the column change in the Sheet, or update `instrument/items.yaml` in the repo to match the deployed version.
 
@@ -741,7 +903,7 @@ Run `checkSetup` to see exactly what the script sees.
 
 **Why:** the anonymity rule working as designed.
 
-**Fix:** collect more responses. For leaders vs. IC comparisons, each group needs 5 or more.
+**Fix:** collect more responses. For leaders vs. IC comparisons, each group needs 5 or more. For the leadership survey, see [T-21](#t-21-leader-results-suppressed).
 
 ### T-17: No Value leakage section
 
@@ -774,6 +936,48 @@ Run `checkSetup` to see exactly what the script sees.
 **Why:** reports are kept 30 days, deliberately.
 
 **Fix:** re-run the workflow for that campaign; reports rebuild from the Sheet. Download and file final reports at the end of each wave.
+
+## Waves and leadership
+
+### T-21: Leader results suppressed
+
+**What you see:** a leader campaign report says *suppressed*, or the progress report has no *Leaders vs. staff* section.
+
+**Why:** fewer than 3 leaders responded. Leadership groups are small, so the threshold is 3 rather than 5, but below that a leader could be identified.
+
+**Fix:** ask the sponsor to remind leaders. If the client has only one or two leaders in scope, don't run a leader campaign; interview them instead and say so in the readout.
+
+### T-22: No exposure questions
+
+**What you see:** respondents on a T2 or T3 link don't get the *What has changed for you* page, or the progress report has no midpoint/follow-up check.
+
+**Why:** the campaign's `modules` cell is blank or uses codes the survey doesn't know, or `wave` is blank (which means T1).
+
+**Fix:** in the Campaigns tab, set `wave` to `T2` or `T3` and list modules as `M3, M6, M7` (M1–M12; separators don't matter). Run `checkSetup`: each campaign's line shows the modules it found. No redeploy is needed for Campaigns tab changes.
+
+### T-23: No progress report
+
+**What you see:** the artifact has campaign reports but no `ENGAGEMENT-…` folder, or a wave you ran is missing from it.
+
+**Why:** a progress report needs two or more groups (wave and audience) in the same engagement. Usually the `engagement` cell differs between rows (for example `ACME` and `Acme Corp`), or is blank, so each campaign becomes its own engagement. A group that is suppressed appears in *Who answered* but is left out of comparisons.
+
+**Fix:** give every campaign of the engagement the same `engagement` value. Answers already submitted keep the engagement they were recorded with, so fix it before launch; if it's already wrong, contact support to correct the rows rather than editing the Responses tab by hand.
+
+### T-24: No reliable change
+
+**What you see:** a dimension's score rose (or fell) a few points between waves, but its status is *No reliable change*.
+
+**Why:** a change counts only if it's at least 5 index points **and** statistically reliable (p < 0.05). Small groups and spread-out answers make smaller moves indistinguishable from noise.
+
+**Fix:** report it honestly as "no measurable change yet". If the client needs finer detail, raise response rates at the next wave; larger groups detect smaller changes.
+
+### T-25: Wrong survey version
+
+**What you see:** a leader link shows *Your experience with AI at work* (the staff intro), or a staff link shows the leadership questions.
+
+**Why:** the `audience` cell for that campaign is blank, misspelled, or set to the other value. Anything other than `leader` means staff.
+
+**Fix:** correct the `audience` cell. Answers already submitted keep the audience they were recorded with.
 
 ## When you need help
 

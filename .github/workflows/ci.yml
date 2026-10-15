@@ -23,5 +23,7 @@ jobs:
         run: |
           python -m arc build-collector
           git diff --exit-code collector/Items.gs || (echo "::error::collector/Items.gs is out of date. Run: python -m arc build-collector" && exit 1)
+      - name: Survey collector (Apps Script) logic
+        run: node tests/collector.test.js
       - name: End-to-end run on demo data
         run: python -m arc run --source csv --path data/demo --out reports --benchmark /tmp/benchmark.json

@@ -22,10 +22,14 @@ def render() -> str:
         "pillars": inst.raw["pillars"],
         "dimensions": [
             {"code": d.code, "name": d.name, "pillar": d.pillar,
-             "items": [{"id": i.id, "text": i.text, "reverse": i.reverse} for i in d.items]}
+             "items": [{"id": i.id, "text": i.text, "leaderText": i.leader_text, "reverse": i.reverse}
+                       for i in d.items]}
             for d in inst.dimensions
         ],
         "behavioral": inst.behavioral,
+        "exposure": inst.raw["exposure"],
+        "change": inst.raw["change"],
+        "leadership": inst.raw["leadership"],
         "openQuestion": inst.raw["open_question"],
         "columns": inst.columns + ["instrument_version"],
     }

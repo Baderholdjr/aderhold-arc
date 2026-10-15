@@ -21,8 +21,8 @@ SRC = ROOT / "docs" / "manual" / "manual.md"
 CSS = ROOT / "docs" / "manual" / "manual.css"
 OUT = ROOT / "docs" / "manual" / "index.html"
 
-ENGINE_VERSION = "1.0.0"
-INSTRUMENT_VERSION = "1.0.0"
+ENGINE_VERSION = "1.1.0"
+INSTRUMENT_VERSION = "1.1.0"
 
 LABELS = {"plain": "In plain terms", "practice": "For A.R.C. practitioners",
           "tech": "Under the hood", "shot": "Screenshot to add"}

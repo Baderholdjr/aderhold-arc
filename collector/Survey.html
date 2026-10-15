@@ -59,11 +59,22 @@ var DISPLAY = <?!= JSON.stringify(displayName) ?>;
 var IS_OPEN = <?!= JSON.stringify(isOpen) ?>;
 var CLOSED_REASON = <?!= JSON.stringify(closedReason) ?>;
 var REQUESTED = <?!= JSON.stringify(requestedCode) ?>;
+var META = <?!= campaignJson ?>;
 
 var answers = {}; var consentResearch = false; var step = 0; var sending = false;
 var role = INSTRUMENT.behavioral.filter(function (b) { return b.key === 'role'; })[0];
 var behavior = INSTRUMENT.behavioral.filter(function (b) { return b.key !== 'role'; });
-var steps = ['intro', 'role'].concat(INSTRUMENT.pillars.map(function (p) { return 'pillar:' + p.name; })).concat(['behavior', 'open']);
+var LEADER = META.audience === 'leader';
+var WAVE = META.wave || 'T1';
+var MODULES = META.modules || [];
+var exposureItems = WAVE === 'T1' ? [] : INSTRUMENT.exposure.items.filter(function (x) { return MODULES.indexOf(x.module) >= 0; });
+var steps = ['intro'].concat(LEADER ? [] : ['role'])
+  .concat(INSTRUMENT.pillars.map(function (p) { return 'pillar:' + p.name; }))
+  .concat(['behavior'])
+  .concat(exposureItems.length ? ['exposure'] : [])
+  .concat(WAVE === 'T3' ? ['change'] : [])
+  .concat(LEADER ? ['leadership'] : [])
+  .concat(['open']);
 
 document.getElementById('org').textContent = DISPLAY ? 'For ' + DISPLAY : '';
 
@@ -87,14 +98,53 @@ function render() {
   if (s === 'role') return renderOptions(app, 'About you', '', [role]);
   if (s.indexOf('pillar:') === 0) return renderPillar(app, s.slice(7));
   if (s === 'behavior') return renderOptions(app, 'How you use AI today', 'Choose the closest answer.', behavior);
+  if (s === 'exposure') return renderChoices(app, 'What has changed for you', LEADER ?
+      'Over the past few months, which of these have happened in your area?' :
+      'Over the past few months, which of these have happened for you?',
+      exposureItems, INSTRUMENT.exposure.scale);
+  if (s === 'change') return renderChoices(app, 'Looking back', LEADER ? INSTRUMENT.change.leader_prompt : INSTRUMENT.change.prompt,
+      INSTRUMENT.change.items, INSTRUMENT.change.scale);
+  if (s === 'leadership') return renderLeadership(app);
   if (s === 'open') return renderOpen(app);
 }
 
+function textFor(x) { return LEADER && (x.leaderText || x.leader_text) ? (x.leaderText || x.leader_text) : x.text; }
+
+function optionsHtml(name, options) {
+  return '<div class="opts" role="radiogroup">' + options.map(function (o) {
+    var v = o.value === null ? '' : String(o.value); var chk = answers[name] !== undefined && String(answers[name]) === v ? ' checked' : '';
+    return '<label><input type="radio" name="' + esc(name) + '" value="' + esc(v) + '"' + chk + '>' + esc(o.label) + '</label>';
+  }).join('') + '</div>';
+}
+
+function renderChoices(app, title, lead, items, scale) {
+  var html = '<div class="card"><h2>' + esc(title) + '</h2><p class="lead">' + esc(lead) + '</p>';
+  items.forEach(function (x) { html += '<div class="q"><p>' + esc(textFor(x)) + '</p>' + optionsHtml(x.id, scale) + '</div>'; });
+  html += navHtml() + '</div>';
+  var c = el(html); app.appendChild(c); wire(c);
+}
+
+function renderLeadership(app) {
+  var html = '<div class="card"><h2>Your leadership view</h2><p class="lead">A few questions only leaders are asked.</p>';
+  INSTRUMENT.leadership.items.forEach(function (x) {
+    html += '<div class="q"><p>' + esc(x.text) + '</p>' + (x.type === 'likert' ? scaleHtml(x.id) : optionsHtml(x.id, x.options)) + '</div>';
+  });
+  html += navHtml() + '</div>';
+  var c = el(html); app.appendChild(c); wire(c);
+}
+
 function renderIntro(app) {
-  var c = el('<div class="card"><h2>Your experience with AI at work</h2>' +
-    '<p class="lead">About 12 minutes. There are no right answers; we want your honest view of how AI tools are working for you and your team.</p>' +
-    '<ul class="small"><li><b>Anonymous.</b> We do not collect your name, email or device details.</li>' +
-    '<li><b>Reported in groups only.</b> Results are shown only for groups of 5 or more people.</li>' +
+  var title = LEADER ? 'Leadership view: AI in your organization' : 'Your experience with AI at work';
+  var lead = LEADER ?
+    'About 12 minutes. You will see the same topics your people are asked about, worded from a leader\'s point of view, plus a few leadership questions.' :
+    'About 12 minutes. There are no right answers; we want your honest view of how AI tools are working for you and your team.';
+  var groups = LEADER ?
+    '<li><b>Reported as a group.</b> Leadership results are shown only when 3 or more leaders respond. Because leadership groups are small, please avoid details in comments that would identify you.</li>' :
+    '<li><b>Reported in groups only.</b> Results are shown only for groups of 5 or more people.</li>';
+  if (WAVE !== 'T1') lead += ' This is a follow-up survey: please answer even if you took part last time.';
+  var c = el('<div class="card"><h2>' + esc(title) + '</h2>' +
+    '<p class="lead">' + esc(lead) + '</p>' +
+    '<ul class="small"><li><b>Anonymous.</b> We do not collect your name, email or device details.</li>' + groups +
     '<li><b>Voluntary.</b> You may skip any question or stop at any time.</li></ul>' +
     '<label class="check"><input type="checkbox" id="consent"> <span>I understand and agree to take part.</span></label>' +
     '<label class="check"><input type="checkbox" id="research"> <span>Optional: my anonymous answers may also be included in aggregated research to improve the A.R.C. framework.</span></label>' +
@@ -117,8 +167,9 @@ function scaleHtml(id) {
 function renderPillar(app, pillar) {
   var dims = INSTRUMENT.dimensions.filter(function (d) { return d.pillar === pillar; });
   var meta = INSTRUMENT.pillars.filter(function (p) { return p.name === pillar; })[0];
-  var html = '<div class="card"><h2>' + esc(pillar) + '</h2><p class="lead">' + esc(meta.question) + ' How much do you agree with each statement?</p>';
-  dims.forEach(function (d) { d.items.forEach(function (it) { html += '<div class="q"><p>' + esc(it.text) + '</p>' + scaleHtml(it.id) + '</div>'; }); });
+  var ask = LEADER ? ' How much do you agree with each statement about your organization?' : ' How much do you agree with each statement?';
+  var html = '<div class="card"><h2>' + esc(pillar) + '</h2><p class="lead">' + esc(meta.question) + ask + '</p>';
+  dims.forEach(function (d) { d.items.forEach(function (it) { html += '<div class="q"><p>' + esc(textFor(it)) + '</p>' + scaleHtml(it.id) + '</div>'; }); });
   html += navHtml() + '</div>';
   var c = el(html); app.appendChild(c); wire(c);
 }
@@ -136,7 +187,8 @@ function renderOptions(app, title, lead, questions) {
 }
 
 function renderOpen(app) {
-  var c = el('<div class="card"><h2>One last question</h2><div class="q"><p>' + esc(INSTRUMENT.openQuestion) + '</p>' +
+  var openQ = LEADER ? INSTRUMENT.leadership.open_question : INSTRUMENT.openQuestion;
+  var c = el('<div class="card"><h2>One last question</h2><div class="q"><p>' + esc(openQ) + '</p>' +
     '<textarea id="open" maxlength="1000" placeholder="Optional. Please do not include names."></textarea></div>' +
     '<input class="hp" type="text" id="website" tabindex="-1" autocomplete="off" aria-hidden="true">' +
     '<div class="err" id="err"></div><div class="nav"><button class="secondary" id="back">Back</button><button class="primary" id="submit">Submit</button></div></div>');

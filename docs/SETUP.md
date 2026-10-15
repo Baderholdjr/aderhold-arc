@@ -15,12 +15,12 @@ You need a Google account and this GitHub repository. Everything uses free tiers
    * `Items.gs`: **+ → Script**, name it `Items`.
    * `Survey.html`: **+ → HTML**, name it `Survey`.
 3. **Project Settings (gear icon) → Show "appsscript.json" manifest file**. Then replace `appsscript.json` with `collector/appsscript.json`.
-4. Select the function **setup** in the toolbar and click **Run**. Approve the permission prompt; the script only gets access to this one spreadsheet. This creates the **Responses** and **Campaigns** tabs.
+4. Select the function **setup** in the toolbar and click **Run**. Approve the permission prompt; the script only gets access to this one spreadsheet. This creates the **Responses** and **Campaigns** tabs and four test campaigns: `TEST-0001` (staff baseline), `TEST-LEAD` (leadership survey), `TEST-T2` (midpoint) and `TEST-T3` (follow-up).
 5. **Deploy → New deployment → type: Web app**.
    * Execute as: **Me**
    * Who has access: **Anyone**. Respondents don't sign in, which keeps the survey anonymous.
    * Click **Deploy** and copy the **Web app URL**.
-6. Test it: open `<Web app URL>?code=TEST-0001`, complete the survey, and check that a row appears in **Responses**.
+6. Test it: open `<Web app URL>?code=TEST-0001`, complete the survey, and check that a row appears in **Responses**. Then open `?code=TEST-LEAD`, `?code=TEST-T2` and `?code=TEST-T3` to see the other versions.
 
 > When you later update `Survey.html`, `Code.gs` or `Items.gs`: **Deploy → Manage deployments → edit (pencil) → Version: New version → Deploy**. The URL stays the same.
 
@@ -50,17 +50,43 @@ Then delete the downloaded key file from your computer, or store it in a passwor
 
 From then on it runs every night at about 3:17 a.m. Pacific.
 
-## Launching a client wave
+## Running a client engagement
 
-1. Pick a code such as `ACME-2026Q4`, using letters, digits and dashes.
-2. Add a row to the Sheet's **Campaigns** tab: `code = ACME-2026Q4`, `display_name = Acme`, `active = TRUE`.
-3. Add `campaigns/ACME-2026Q4.yaml` to the repo, copied from `campaigns/_TEMPLATE.yaml`.
-4. Send the link: `<Web app URL>?code=ACME-2026Q4`. The client's sponsor should send it, explaining the purpose and the anonymity rules.
-5. When the wave closes, set `active = FALSE`. The link then shows "not active".
+An engagement has up to three waves (T1 baseline, T2 midpoint, T3 follow-up) and two audiences (staff and leaders). Each wave/audience pair is one campaign, with its own link.
+
+| Campaigns column | Example | Meaning |
+| --- | --- | --- |
+| `code` | `ACME-T1-STAFF` | The link code: letters, digits and dashes |
+| `display_name` | `Acme` | Shown on the survey header |
+| `active` | `TRUE` | Accepts answers while TRUE |
+| `notes` | | Free text |
+| `engagement` | `ACME` | Same value for every campaign of the engagement (blank = the code) |
+| `wave` | `T1`, `T2` or `T3` | Blank = T1 |
+| `audience` | `staff` or `leader` | Blank = staff |
+| `modules` | `M3, M6, M7` | T2/T3 only: recommendations implemented; drives the exposure questions |
+
+1. **Baseline:** add `ACME-T1-STAFF` and `ACME-T1-LEAD`. Copy `engagements/_TEMPLATE.yaml` to `engagements/ACME.yaml` and fill in the ROI inputs.
+2. Send each link (`<Web app URL>?code=ACME-T1-STAFF`) through the client's sponsor, explaining the purpose and the anonymity rules. Leader results are reported at 3+ responses, staff at 5+.
+3. **Midpoint**, 6–10 weeks after recommendations go live: add `ACME-T2-STAFF` with wave `T2` and the implemented modules.
+4. **Follow-up**, 3–6 months after T1: add `ACME-T3-STAFF` and `ACME-T3-LEAD` with wave `T3` and the modules.
+5. Close each wave by setting `active = FALSE`.
+
+Each campaign gets its own report; the engagement gets a progress report (`ENGAGEMENT-ACME/engagement.html`) once it has two or more groups.
+
+A one-off diagnostic is still a single campaign (for example `ACME-2026Q4`) with `campaigns/ACME-2026Q4.yaml`.
+
+## Upgrading from v1.0 to v1.1
+
+1. In Apps Script, replace `Code.gs`, `Items` and `Survey` with the current files from `collector/`. Save.
+2. Run **setup**. It renames the existing Responses tab to `Responses v1.0.0`, starts a new Responses tab, adds the four new Campaigns columns and the new test campaigns. Existing campaign rows keep working as staff baselines.
+3. **Deploy → Manage deployments → pencil → Version: New version → Deploy.**
+4. Test `?code=TEST-LEAD`, `?code=TEST-T2` and `?code=TEST-T3`.
+
+The nightly run reads both the new and the earlier-version tabs.
 
 ## Changing the instrument version
 
-Responses from different instrument versions must not mix. Before deploying a new `Items.gs`, rename the existing **Responses** tab (e.g. `Responses v1.0.0`) and run **setup** again. Item ids that stay the same remain comparable in the benchmark.
+Responses from different instrument versions must not mix. After pasting a new `Items.gs`, run **setup**: it moves the existing responses to a tab named after their version (for example `Responses v1.1.0`) and starts a fresh Responses tab. Don't rename or delete those tabs; the nightly run reads every tab named `Responses` or `Responses v…`. Item ids that stay the same remain comparable in the benchmark. Avoid changing the instrument in the middle of an engagement.
 
 ## Troubleshooting
 
@@ -73,3 +99,6 @@ Responses from different instrument versions must not mix. Before deploying a ne
 | Changes don't appear | The deployment still points to an old version | **Deploy → Manage deployments → pencil → Version: New version → Deploy** |
 | Nightly run says secrets are not set | `ARC_SHEET_ID` / `GOOGLE_SERVICE_ACCOUNT` are missing | Step 4 above |
 | Nightly run fails with a permission error | The Sheet isn't shared with the service account email | Share the Sheet with it as Viewer |
+| T2/T3 survey has no "What has changed" page | `wave` blank or `modules` blank/misspelled | Set `wave` and list modules as `M3, M6`; check with `checkSetup()` |
+| No progress report | The engagement's campaigns have different `engagement` values, or only one group has responses | Use the same `engagement` value on every row |
+| Leader report suppressed | Fewer than 3 leader responses | Collect more, or interview leaders instead |

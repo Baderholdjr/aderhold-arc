@@ -1,0 +1,18 @@
+# Engagement configuration: one file per client program (all waves, both audiences).
+# File name = engagement code (the `engagement` column in the Sheet's Campaigns tab).
+client: Client name or code name
+waves:
+  T1: YYYY-MM-DD
+  T2: YYYY-MM-DD
+  T3: YYYY-MM-DD
+implemented_modules: []   # e.g. [M3, M6, M7]; also list them in the Campaigns tab for T2/T3 links
+roi:
+  users: 500
+  hours_saved_per_week: 3
+  loaded_hourly_cost: 60
+  working_weeks: 46
+  healthy_verification_share: 0.20
+  targets: {adoption: 0.75, depth: 0.65, verification: 0.25, capture: 0.75}
+  errors_per_year: 12
+  cost_per_error: 25000
+  engagement_fee: 150000

@@ -7,8 +7,8 @@ Candid answers are the product. People only answer candidly if anonymity is real
 | Collected | Not collected |
 | --- | --- |
 | Random response id, campaign code, submission **date** (UTC, no time) | Name, email, employee id |
-| Role group (IC / manager / senior leader) | IP address, device or browser details |
-| 45 agreement answers, 7 behavioral answers, one optional comment | Exact timestamp, location |
+| Role group (IC / manager / senior leader, or leader on the leadership survey), campaign wave and audience | IP address, device or browser details |
+| 45 agreement answers, 7 behavioral answers, one optional comment; at midpoint and follow-up, yes/no answers on which changes reached them and five "looking back" ratings; for leaders, seven leadership answers | Exact timestamp, location |
 | Research-consent flag (optional, separate from taking part) | Sign-in identity (the survey needs no login) |
 
 Comments are capped at 1,000 characters, and respondents are asked not to include names. Text that could execute as a spreadsheet formula is neutralized.
@@ -22,6 +22,8 @@ Comments are capped at 1,000 characters, and respondents are asked not to includ
 ## Reporting rules
 
 * Groups with fewer than **5** respondents are suppressed everywhere: the whole campaign, the IC group and the leaders group.
+* **Leadership survey** campaigns are reported at **3** or more respondents, because leadership groups are small. Leaders are told this before they start and asked to keep identifying details out of comments. Review leader comments with extra care; don't quote them if the group is under 5.
+* **Waves are linked at group level only.** No identifier follows a person from the baseline to the follow-up survey, so no individual's change can be tracked.
 * Comments are reviewed by the consultant before any are quoted, and potentially identifying details are removed.
 * Clients never receive the raw Sheet.
 
