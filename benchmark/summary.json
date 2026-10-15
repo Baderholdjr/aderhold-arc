@@ -1,1 +1,30 @@
-{"note": "Populated by the nightly workflow. Aggregates only."}
+{
+  "instrument_version": "1.0.0",
+  "campaigns_included": 0,
+  "respondents_pooled_with_consent": 0,
+  "dimensions": {
+    "A1": null,
+    "A2": null,
+    "A3": null,
+    "A4": null,
+    "R1": null,
+    "R2": null,
+    "R3": null,
+    "R4": null,
+    "C1": null,
+    "C2": null,
+    "C3": null,
+    "C4": null,
+    "F1": null,
+    "F2": null,
+    "F3": null
+  },
+  "pillars": {
+    "Acceptance": null,
+    "Reliance": null,
+    "Collaboration": null,
+    "Foundation": null
+  },
+  "reliability": "Deferred until 30 consented responses",
+  "structure": "Deferred until 45 complete consented responses"
+}
