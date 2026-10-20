@@ -70,3 +70,7 @@ Edit `instrument/items.yaml`, bump `instrument.version`, run `python -m arc buil
 ## Manual
 
 The user manual (product guide, training guide, troubleshooting guide) is in [`docs/manual/`](docs/manual/). Edit `docs/manual/manual.md`, then run `python tools/build_manual.py` to rebuild `index.html`.
+
+## License
+
+[PolyForm Noncommercial 1.0.0](https://polyformproject.org/licenses/noncommercial/1.0.0/) — free for noncommercial use; commercial use by arrangement. © 2025–2026 Bernard A. Aderhold Jr.
